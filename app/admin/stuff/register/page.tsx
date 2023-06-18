@@ -14,8 +14,6 @@ export default function Top() {
   const [gender, setGender] = useState("男性");
   const [profile, setProfile] = useState("");
 
-  console.log(gender);
-
   const addStuff = async () => {
     try {
       const docRef = await addDoc(collection(db, "stuffs"), {
