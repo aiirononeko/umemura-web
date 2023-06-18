@@ -11,8 +11,10 @@ export default function Top() {
 
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [gender, setGender] = useState(["男性", "女性"]);
+  const [gender, setGender] = useState("男性");
   const [profile, setProfile] = useState("");
+
+  console.log(gender);
 
   const addStuff = async () => {
     try {
@@ -78,9 +80,11 @@ export default function Top() {
           <select
             className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             id="grid-state"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
           >
-            <option value={gender}>男性</option>
-            <option value={gender}>女性</option>
+            <option>男性</option>
+            <option>女性</option>
           </select>
         </div>
         <div className="flex flex-wrap -mx-3 mb-6 mt-6">
