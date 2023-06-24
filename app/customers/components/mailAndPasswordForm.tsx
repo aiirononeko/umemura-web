@@ -6,7 +6,6 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { auth } from '../../firebase/config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { NextRouter } from 'next/router';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 interface Parameter {
@@ -60,11 +59,12 @@ function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Para
         setLoading(false);
       });
   } else {
-    console.log('login');
+    console.log('sign up');
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('success');
         const user = userCredential.user;
+        const uid = user.uid;
         console.log(user);
         router.push('/');
       })
