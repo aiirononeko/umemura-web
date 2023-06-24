@@ -8,7 +8,8 @@ export default function Login() {
     <div className='container px-8 pt-2'>
       <Form>
         <MailAndPasswordForm
-          buttonName="ログイン"
+          buttonValue="ログイン"
+          isLogin={true}
         />
       </Form>
     </div>

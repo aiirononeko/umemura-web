@@ -1,8 +1,15 @@
 'use client';
 
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button, Form, Input, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+
+interface Parameter {
+  name: string;
+  email: string;
+  password: string;
+  isLogin: boolean;
+}
 
 const SpinCss: React.CSSProperties = {
   width: '100vw',
@@ -26,28 +33,46 @@ const Loding = () => {
   );
 }
 
-function onCilick(setLoading: Dispatch<SetStateAction<boolean>>) {
+function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Parameter) {
+  console.log(parameter);
   setLoading(true);
 }
 
-export default function MailAndPasswordForm(props: {buttonName: string}) {
+export default function MailAndPasswordForm(props: {name?: string, buttonValue: string, isLogin: boolean}) {
+  const { buttonValue, isLogin, name } = props;
   const [loading, setLoading] = useState(false);
-  const { buttonName } = props;
+  const [parameter, setParameter] = useState<Parameter>({
+    name: name || '',
+    email: '',
+    password: '',
+    isLogin: isLogin,
+  });
+
+  useEffect(() => {
+    setParameter({ ...parameter, name: name || ''});
+  }, [name])
+
   return (
     <>
       <Form.Item>
-        <Input placeholder="メールアドレス" />
+        <Input
+          placeholder="メールアドレス"
+          onChange={(e) => setParameter({ ...parameter, email: e.target.value })}
+        />
       </Form.Item>
       <Form.Item>
-        <Input.Password placeholder="パスワード" />
+        <Input.Password
+          placeholder="パスワード"
+          onChange={(e) => setParameter({ ...parameter, password: e.target.value })}
+        />
       </Form.Item>
       <Form.Item className='flex justify-center'>
         <Button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
           htmlType="submit"
-          onClick={() => onCilick(setLoading)}
+          onClick={() => onCilick(setLoading, parameter)}
         >
-          {buttonName}
+          {buttonValue}
         </Button>
       </Form.Item>
       {
