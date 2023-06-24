@@ -1,7 +1,7 @@
 'use client';
 
 import { Form } from "antd";
-import MailAndPasswordForm from '../mailAndPasswordForm';
+import MailAndPasswordForm from '../components/mailAndPasswordForm';
 
 export default function Login() {
   return (
