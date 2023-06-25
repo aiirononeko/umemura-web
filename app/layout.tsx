@@ -1,3 +1,4 @@
+import React from "react";
 import Footer from "./_common/footer";
 import Header from "./_common/header";
 import "./globals.css";
@@ -19,7 +20,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={inter.className}>
         <Header />
-        {children}
+          {children}
         <Footer />
       </body>
     </html>
