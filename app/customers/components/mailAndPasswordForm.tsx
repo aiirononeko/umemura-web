@@ -14,6 +14,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 
 interface Parameter {
   name: string;
+  phoneNumber: number;
   email: string;
   password: string;
   isLogin: boolean;
@@ -43,6 +44,7 @@ const Loding = () => {
 
 async function addCostomer(
   name: string,
+  phoneNumber: number,
   email: string,
   password: string,
   uid: string
@@ -50,6 +52,7 @@ async function addCostomer(
   try {
     await setDoc(doc(db, "customers", uid), {
       name,
+      phoneNumber,
       email,
       password,
     });
@@ -69,7 +72,7 @@ function onCilick(
   parameter: Parameter,
   router: AppRouterInstance
 ) {
-  const { name, email, password, isLogin } = parameter;
+  const { name, phoneNumber, email, password, isLogin } = parameter;
   setLoading(true);
 
   if (isLogin) {
@@ -91,7 +94,7 @@ function onCilick(
       .then((userCredential) => {
         const user = userCredential.user;
         const uid = user.uid;
-        addCostomer(name, email, password, uid);
+        addCostomer(name, phoneNumber, email, password, uid);
         setCurrentUser();
         window.alert("登録が完了しました。");
         router.push("/");
@@ -109,22 +112,24 @@ function onCilick(
 
 export default function MailAndPasswordForm(props: {
   name?: string;
+  phoneNumber?: number;
   buttonValue: string;
   isLogin: boolean;
 }) {
-  const { buttonValue, isLogin, name } = props;
+  const { buttonValue, isLogin, name, phoneNumber } = props;
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [parameter, setParameter] = useState<Parameter>({
     name: name || "",
+    phoneNumber: phoneNumber || 0,
     email: "",
     password: "",
     isLogin: isLogin,
   });
 
   useEffect(() => {
-    setParameter({ ...parameter, name: name || "" });
-  }, [name]);
+    setParameter({ ...parameter, name: name || "", phoneNumber: phoneNumber || 0 });
+  }, [name, phoneNumber]);
 
   return (
     <>
