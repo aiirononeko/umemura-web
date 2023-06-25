@@ -3,7 +3,8 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button, Form, Input, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { auth } from '../../firebase/config';
+import { auth, db } from '../../firebase/config';
+import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
@@ -37,6 +38,18 @@ const Loding = () => {
   );
 }
 
+async function addCostomer(name: string, email: string, password: string, uid: string) {
+  try {
+    await setDoc(doc(db, "customers", uid), {
+      name,
+      email,
+      password,
+    });
+  } catch (error) {
+    window.alert(error);
+  }
+};
+
 function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Parameter, router: AppRouterInstance) {
   const { name, email, password, isLogin } = parameter;
   setLoading(true);
@@ -44,34 +57,29 @@ function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Para
   if (isLogin) {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('login');
         const user = userCredential.user;
-        console.log(userCredential);
         router.push('/');
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-        window.alert('メールアドレスかパスワードが間違っています');
+        window.alert(`${errorCode}: ${errorMessage}`);
       })
       .finally(() => {
         setLoading(false);
       });
   } else {
-    console.log('sign up');
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('success');
         const user = userCredential.user;
         const uid = user.uid;
-        console.log(user);
+        addCostomer(name, email, password, uid)
         router.push('/');
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        window.alert(`${errorCode}: ${errorMessage}`);
       })
       .finally(() => {
         setLoading(false);
