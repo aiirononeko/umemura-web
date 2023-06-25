@@ -50,14 +50,18 @@ async function addCostomer(name: string, email: string, password: string, uid: s
   }
 };
 
+function setCurrentUser() {
+  auth.onAuthStateChanged(() => {});
+}
+
 function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Parameter, router: AppRouterInstance) {
   const { name, email, password, isLogin } = parameter;
   setLoading(true);
 
   if (isLogin) {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+      .then((_userCredential) => {
+        setCurrentUser();
         router.push('/');
       })
       .catch((error) => {
@@ -74,6 +78,8 @@ function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Para
         const user = userCredential.user;
         const uid = user.uid;
         addCostomer(name, email, password, uid)
+        setCurrentUser();
+        window.alert('登録が完了しました。');
         router.push('/');
       })
       .catch((error) => {
