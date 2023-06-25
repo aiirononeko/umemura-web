@@ -1,13 +1,16 @@
-'use client';
+"use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Button, Form, Input, Spin } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
-import { auth, db } from '../../firebase/config';
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Button, Form, Input, Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { auth, db } from "../../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 
 interface Parameter {
   name: string;
@@ -17,16 +20,16 @@ interface Parameter {
 }
 
 const SpinCss: React.CSSProperties = {
-  width: '100vw',
-  height: '100vh',
+  width: "100vw",
+  height: "100vh",
   top: 0,
   left: 0,
-  backgroundColor: '#8888',
-  position: 'fixed',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}
+  backgroundColor: "#8888",
+  position: "fixed",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
 
 const Loding = () => {
   return (
@@ -36,9 +39,14 @@ const Loding = () => {
       <Spin indicator={<LoadingOutlined />} spinning={true} />
     </div>
   );
-}
+};
 
-async function addCostomer(name: string, email: string, password: string, uid: string) {
+async function addCostomer(
+  name: string,
+  email: string,
+  password: string,
+  uid: string
+) {
   try {
     await setDoc(doc(db, "customers", uid), {
       name,
@@ -48,7 +56,7 @@ async function addCostomer(name: string, email: string, password: string, uid: s
   } catch (error) {
     window.alert(error);
   }
-};
+}
 
 function setCurrentUser() {
   auth.onAuthStateChanged((user) => {
@@ -56,7 +64,11 @@ function setCurrentUser() {
   });
 }
 
-function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Parameter, router: AppRouterInstance) {
+function onCilick(
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  parameter: Parameter,
+  router: AppRouterInstance
+) {
   const { name, email, password, isLogin } = parameter;
   setLoading(true);
 
@@ -64,7 +76,7 @@ function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Para
     signInWithEmailAndPassword(auth, email, password)
       .then((_userCredential) => {
         setCurrentUser();
-        router.push('/');
+        router.push("/");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -79,10 +91,10 @@ function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Para
       .then((userCredential) => {
         const user = userCredential.user;
         const uid = user.uid;
-        addCostomer(name, email, password, uid)
+        addCostomer(name, email, password, uid);
         setCurrentUser();
-        window.alert('登録が完了しました。');
-        router.push('/');
+        window.alert("登録が完了しました。");
+        router.push("/");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -95,36 +107,44 @@ function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Para
   }
 }
 
-export default function MailAndPasswordForm(props: {name?: string, buttonValue: string, isLogin: boolean}) {
+export default function MailAndPasswordForm(props: {
+  name?: string;
+  buttonValue: string;
+  isLogin: boolean;
+}) {
   const { buttonValue, isLogin, name } = props;
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [parameter, setParameter] = useState<Parameter>({
-    name: name || '',
-    email: '',
-    password: '',
+    name: name || "",
+    email: "",
+    password: "",
     isLogin: isLogin,
   });
 
   useEffect(() => {
-    setParameter({ ...parameter, name: name || ''});
-  }, [name])
+    setParameter({ ...parameter, name: name || "" });
+  }, [name]);
 
   return (
     <>
       <Form.Item>
         <Input
           placeholder="メールアドレス"
-          onChange={(e) => setParameter({ ...parameter, email: e.target.value })}
+          onChange={(e) =>
+            setParameter({ ...parameter, email: e.target.value })
+          }
         />
       </Form.Item>
       <Form.Item>
         <Input.Password
           placeholder="パスワード"
-          onChange={(e) => setParameter({ ...parameter, password: e.target.value })}
+          onChange={(e) =>
+            setParameter({ ...parameter, password: e.target.value })
+          }
         />
       </Form.Item>
-      <Form.Item className='flex justify-center'>
+      <Form.Item className="flex justify-center">
         <Button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
           htmlType="submit"
@@ -133,9 +153,7 @@ export default function MailAndPasswordForm(props: {name?: string, buttonValue: 
           {buttonValue}
         </Button>
       </Form.Item>
-      {
-        loading ? <Loding /> : <div />
-      }
+      {loading ? <Loding /> : <div />}
     </>
   );
 }
