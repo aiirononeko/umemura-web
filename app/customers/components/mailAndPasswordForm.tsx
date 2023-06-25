@@ -51,7 +51,9 @@ async function addCostomer(name: string, email: string, password: string, uid: s
 };
 
 function setCurrentUser() {
-  auth.onAuthStateChanged(() => {});
+  auth.onAuthStateChanged((user) => {
+    console.log(user);
+  });
 }
 
 function onCilick(setLoading: Dispatch<SetStateAction<boolean>>, parameter: Parameter, router: AppRouterInstance) {
