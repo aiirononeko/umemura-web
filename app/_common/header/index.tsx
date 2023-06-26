@@ -17,12 +17,12 @@ export default function Header() {
             </Link>
           </Menu.Item>
           <Menu.Item key="2">
-            <Link href="/customers/register">
+            <Link href="/signup">
               会員登録
             </Link>
           </Menu.Item>
           <Menu.Item key="3">
-            <Link href="/customers/login">
+            <Link href="/signin">
               ログイン
             </Link>
           </Menu.Item>

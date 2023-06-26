@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Form, Input } from "antd";
-import MailAndPasswordForm from "../components/mailAndPasswordForm";
+import MailAndPasswordForm from "../_components/mailAndPasswordForm";
 
 export default function Login() {
   const [name, setName] = useState("");
