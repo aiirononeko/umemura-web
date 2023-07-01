@@ -106,7 +106,7 @@ export default function SignUp() {
   });
 
   return (
-    <Container className='m-16'>
+    <Container className='m-auto'>
       <form
         onSubmit={form.onSubmit(values => { registerUser(setLoading, values, router) })}
       >

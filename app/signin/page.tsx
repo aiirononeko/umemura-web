@@ -50,13 +50,11 @@ function checkUser(
 
   signInWithEmailAndPassword(auth, email, password)
     .then((_userCredential) => {
-      console.log('login');
       setCurrentUser();
       window.alert("ログインしました");
       router.push("/");
     })
     .catch((error) => {
-      console.log('エラー')
       const errorCode = error.code;
       const errorMessage = error.message;
       window.alert(`${errorCode}: ${errorMessage}`);
@@ -82,7 +80,7 @@ export default function SignIn() {
 
   return (
     <>
-      <Container className='m-16'>
+      <Container className='m-auto'>
         <form
           onSubmit={form.onSubmit(values => { checkUser(setLoading, values, router) })}
         >
