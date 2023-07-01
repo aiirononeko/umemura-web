@@ -2,21 +2,14 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Form, Input, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import { auth, db } from "../firebase/config";
-import { doc, setDoc } from "firebase/firestore";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { auth } from "../firebase/config";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 
 interface Parameter {
-  name: string;
-  phoneNumber: number;
   email: string;
   password: string;
-  isLogin: boolean;
 }
 
 const SpinCss: React.CSSProperties = {
@@ -41,25 +34,6 @@ const Loding = () => {
   );
 };
 
-async function addCostomer(
-  name: string,
-  phoneNumber: number,
-  email: string,
-  password: string,
-  uid: string
-) {
-  try {
-    await setDoc(doc(db, "customers", uid), {
-      name,
-      phoneNumber,
-      email,
-      password,
-    });
-  } catch (error) {
-    window.alert(error);
-  }
-}
-
 function setCurrentUser() {
   auth.onAuthStateChanged((user) => {
     console.log(user);
@@ -71,53 +45,30 @@ function onCilick(
   parameter: Parameter,
   router: AppRouterInstance
 ) {
-  const { name, phoneNumber, email, password, isLogin } = parameter;
+  const { email, password } = parameter;
   setLoading(true);
 
-  if (isLogin) {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((_userCredential) => {
-        setCurrentUser();
-        router.push("/");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        window.alert(`${errorCode}: ${errorMessage}`);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  } else {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        const uid = user.uid;
-        addCostomer(name, phoneNumber, email, password, uid);
-        setCurrentUser();
-        window.alert("登録が完了しました。");
-        router.push("/");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        window.alert(`${errorCode}: ${errorMessage}`);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }
+  signInWithEmailAndPassword(auth, email, password)
+    .then((_userCredential) => {
+      setCurrentUser();
+      router.push("/");
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      window.alert(`${errorCode}: ${errorMessage}`);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
 }
 
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [parameter, setParameter] = useState<Parameter>({
-    name: "",
-    phoneNumber:  0,
     email: "",
     password: "",
-    isLogin: false,
   });
 
   return (
@@ -125,25 +76,9 @@ export default function SignIn() {
       <Form>
         <Form.Item>
           <Input
-            placeholder="名前"
-            onChange={(e) =>
-              setParameter({ ...parameter, name: e.target.value })
-            }
-          />
-        </Form.Item>
-        <Form.Item>
-          <Input
             placeholder="メールアドレス"
             onChange={(e) =>
               setParameter({ ...parameter, email: e.target.value })
-            }
-          />
-        </Form.Item>
-        <Form.Item>
-          <Input
-            placeholder="電話番号(半角・ハイフンなし)"
-            onChange={(e) =>
-              setParameter({ ...parameter, phoneNumber: Number(e.target.value) })
             }
           />
         </Form.Item>

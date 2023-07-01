@@ -1,12 +1,10 @@
+"use client";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Form, Input, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { auth, db } from "../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 
@@ -15,7 +13,6 @@ interface Parameter {
   phoneNumber: number;
   email: string;
   password: string;
-  isLogin: boolean;
 }
 
 const SpinCss: React.CSSProperties = {
@@ -70,45 +67,29 @@ function onCilick(
   parameter: Parameter,
   router: AppRouterInstance
 ) {
-  const { name, phoneNumber, email, password, isLogin } = parameter;
+  const { name, phoneNumber, email, password } = parameter;
   setLoading(true);
 
-  if (isLogin) {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((_userCredential) => {
-        setCurrentUser();
-        router.push("/");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        window.alert(`${errorCode}: ${errorMessage}`);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  } else {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        const uid = user.uid;
-        addCostomer(name, phoneNumber, email, password, uid);
-        setCurrentUser();
-        window.alert("登録が完了しました。");
-        router.push("/");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        window.alert(`${errorCode}: ${errorMessage}`);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      const uid = user.uid;
+      addCostomer(name, phoneNumber, email, password, uid);
+      setCurrentUser();
+      window.alert("登録が完了しました。");
+      router.push("/");
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      window.alert(`${errorCode}: ${errorMessage}`);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
 }
 
-export default function SignIn() {
+export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [parameter, setParameter] = useState<Parameter>({
@@ -116,7 +97,6 @@ export default function SignIn() {
     phoneNumber:  0,
     email: "",
     password: "",
-    isLogin: false,
   });
 
   return (
