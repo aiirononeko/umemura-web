@@ -81,6 +81,11 @@ export default function Top() {
             ))}
           </tbody>
         </Table>
+        <Center className="mt-12">
+          <Link href="/admin">
+            管理者画面ページ
+          </Link>
+        </Center>
       </Container>
     </>
   );
