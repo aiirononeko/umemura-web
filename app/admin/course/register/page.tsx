@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { db } from "../../../firebase/config";
-import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { addCollection } from "@/app/_common/registerCollection";
+import { Course } from "@/app/_common/collection";
+import { Loading } from "@/app/_common/loading";
 
 export default function Top() {
   const router = useRouter();
@@ -13,22 +14,7 @@ export default function Top() {
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
-
-  const addCourse = async () => {
-    try {
-      const docRef = await addDoc(collection(db, "courses"), {
-        title,
-        time,
-        description,
-        amount,
-      });
-      console.log("Document written with ID: ", docRef.id);
-
-      router.push("/admin/course");
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
+  const [loading, setLoading] = useState(false);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -100,12 +86,18 @@ export default function Top() {
         </div>
       </form>
       <button
-        onClick={addCourse}
+        onClick={() => {
+          setLoading(true);
+          addCollection({title, time, description, amount} as Course, 'courses');
+          setLoading(false);
+          router.push("/admin/course");
+        }}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         コースを登録する
       </button>
       <Link href="/admin/stuff">スタッフ管理ページへ</Link>
+      {loading ? <Loading /> : <></>}
     </main>
   );
 }

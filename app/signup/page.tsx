@@ -1,91 +1,11 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
-import { auth, db } from "../firebase/config";
-import { doc, setDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-import { Loader, TextInput, Button, Container, Center } from '@mantine/core';
+import { TextInput, Button, Container, Center } from '@mantine/core';
 import { useForm } from '@mantine/form';
-
-interface Parameter {
-  name: string;
-  phoneNumber: string;
-  email: string;
-  password: string;
-}
-
-const SpinCss: React.CSSProperties = {
-  width: "100vw",
-  height: "100vh",
-  top: 0,
-  left: 0,
-  backgroundColor: "#8888",
-  position: "fixed",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const Loding = () => {
-  return (
-    <div style={SpinCss}>
-      <h1>Loding...</h1>
-      <br />
-      <Loader size='xl' />
-    </div>
-  );
-};
-
-async function addCostomer(
-  name: string,
-  phoneNumber: string,
-  email: string,
-  password: string,
-  uid: string
-) {
-  try {
-    await setDoc(doc(db, "customers", uid), {
-      name,
-      phoneNumber,
-      email,
-      password,
-    });
-  } catch (error) {
-    window.alert(error);
-  }
-}
-
-function setCurrentUser() {
-  auth.onAuthStateChanged((user) => {
-    console.log(user);
-  });
-}
-
-function registerUser(
-  setLoading: Dispatch<SetStateAction<boolean>>,
-  parameter: Parameter,
-  router: AppRouterInstance
-) {
-  const { name, phoneNumber, email, password } = parameter;
-  setLoading(true);
-
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      const uid = user.uid;
-      addCostomer(name, phoneNumber, email, password, uid);
-      setCurrentUser();
-      window.alert("登録が完了しました。");
-      router.push("/");
-    })
-    .catch((_error) => {
-      window.alert(`既にユーザーが存在します`);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-}
+import { Loading } from "../_common/loading";
+import { type Customer } from '../_common/collection';
+import { registerAuthenticate } from "../_common/authentication";
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -96,7 +16,7 @@ export default function SignUp() {
       phoneNumber:  "",
       email: "",
       password: "",
-    } as Parameter,
+    } as Customer,
     validate: {
       'name': value => value.length < 1 ? '名前を入力してください' : null,
       'email': value => (/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/).test(value) ?  null : 'メールアドレスを正しく入力してください',
@@ -108,7 +28,7 @@ export default function SignUp() {
   return (
     <Container className='m-auto'>
       <form
-        onSubmit={form.onSubmit(values => { registerUser(setLoading, values, router) })}
+        onSubmit={form.onSubmit(values => { registerAuthenticate(values, 'customers', setLoading, router, '/', true) })}
       >
         <TextInput
           label="名前"
@@ -149,7 +69,7 @@ export default function SignUp() {
           </Center>
         </div>
       </form>
-      {loading ? <Loding /> : <></>}
+      {loading ? <Loading /> : <></>}
     </Container>
   );
 }

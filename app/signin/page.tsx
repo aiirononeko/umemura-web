@@ -1,72 +1,20 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
-import { auth } from "../firebase/config";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useRouter } from "next/navigation";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-import { Loader, TextInput, Button, Container, Center } from '@mantine/core';
+
+import { useState } from "react";
+import { TextInput, Button, Container, Center } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { Loading } from "../_common/loading";
+import { authenticate } from "../_common/authentication";
+import { useRouter } from "next/navigation";
 
 interface Parameter {
   email: string;
   password: string;
 }
 
-const SpinCss: React.CSSProperties = {
-  width: "100vw",
-  height: "100vh",
-  top: 0,
-  left: 0,
-  backgroundColor: "#8888",
-  position: "fixed",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const Loding = () => {
-  return (
-    <div style={SpinCss}>
-      <h1>Loding...</h1>
-      <br />
-      <Loader size='xl' />
-    </div>
-  );
-};
-
-function setCurrentUser() {
-  auth.onAuthStateChanged((user) => {
-    console.log(user);
-  });
-}
-
-function checkUser(
-  setLoading: Dispatch<SetStateAction<boolean>>,
-  parameter: Parameter,
-  router: AppRouterInstance
-) {
-  const { email, password } = parameter;
-  setLoading(true);
-
-  signInWithEmailAndPassword(auth, email, password)
-    .then((_userCredential) => {
-      setCurrentUser();
-      window.alert("ログインしました");
-      router.push("/");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      window.alert(`${errorCode}: ${errorMessage}`);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-}
-
 export default function SignIn() {
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     initialValues: {
       email: '',
@@ -82,7 +30,9 @@ export default function SignIn() {
     <>
       <Container className='m-auto'>
         <form
-          onSubmit={form.onSubmit(values => { checkUser(setLoading, values, router) })}
+          onSubmit={form.onSubmit(values => {
+            authenticate(values.email, values.password, setLoading, router, '/')
+          })}
         >
           <TextInput
             label="メールアドレス"
@@ -109,7 +59,7 @@ export default function SignIn() {
             </Center>
           </div>
         </form>
-        {loading ? <Loding /> : <></>}
+        {loading ? <Loading /> : <></>}
       </Container>
     </>
   );
