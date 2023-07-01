@@ -1,16 +1,16 @@
 "use client";
 import { Dispatch, SetStateAction, useState } from "react";
-import { Button, Form, Input, Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
 import { auth, db } from "../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import { Loader, TextInput, Button, Container, Center } from '@mantine/core';
+import { useForm } from '@mantine/form';
 
 interface Parameter {
   name: string;
-  phoneNumber: number;
+  phoneNumber: string;
   email: string;
   password: string;
 }
@@ -32,14 +32,14 @@ const Loding = () => {
     <div style={SpinCss}>
       <h1>Loding...</h1>
       <br />
-      <Spin indicator={<LoadingOutlined />} spinning={true} />
+      <Loader size='xl' />
     </div>
   );
 };
 
 async function addCostomer(
   name: string,
-  phoneNumber: number,
+  phoneNumber: string,
   email: string,
   password: string,
   uid: string
@@ -62,7 +62,7 @@ function setCurrentUser() {
   });
 }
 
-function onCilick(
+function registerUser(
   setLoading: Dispatch<SetStateAction<boolean>>,
   parameter: Parameter,
   router: AppRouterInstance
@@ -79,10 +79,8 @@ function onCilick(
       window.alert("登録が完了しました。");
       router.push("/");
     })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      window.alert(`${errorCode}: ${errorMessage}`);
+    .catch((_error) => {
+      window.alert(`既にユーザーが存在します`);
     })
     .finally(() => {
       setLoading(false);
@@ -92,59 +90,66 @@ function onCilick(
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [parameter, setParameter] = useState<Parameter>({
-    name: "",
-    phoneNumber:  0,
-    email: "",
-    password: "",
+  const form = useForm({
+    initialValues: {
+      name: "",
+      phoneNumber:  "",
+      email: "",
+      password: "",
+    } as Parameter,
+    validate: {
+      'name': value => value.length < 1 ? '名前を入力してください' : null,
+      'email': value => (/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/).test(value) ?  null : 'メールアドレスを正しく入力してください',
+      'phoneNumber': value => (/^0[789]0-[0-9]{4}-[0-9]{4}$/).test(value) ?  null : '電話番号はxxx-yyyy-zzzzのフォーマットで入力してください',
+      'password': value => value.length < 6 ? 'パスワードは6文字以上で入力してください' : null,
+    }
   });
 
   return (
-    <div className="container px-8 pt-2">
-      <Form>
-        <Form.Item>
-          <Input
-            placeholder="名前"
-            onChange={(e) =>
-              setParameter({ ...parameter, name: e.target.value })
-            }
-          />
-        </Form.Item>
-        <Form.Item>
-          <Input
-            placeholder="メールアドレス"
-            onChange={(e) =>
-              setParameter({ ...parameter, email: e.target.value })
-            }
-          />
-        </Form.Item>
-        <Form.Item>
-          <Input
-            placeholder="電話番号(半角・ハイフンなし)"
-            onChange={(e) =>
-              setParameter({ ...parameter, phoneNumber: Number(e.target.value) })
-            }
-          />
-        </Form.Item>
-        <Form.Item>
-          <Input.Password
-            placeholder="パスワード"
-            onChange={(e) =>
-              setParameter({ ...parameter, password: e.target.value })
-            }
-          />
-        </Form.Item>
-        <Form.Item className="flex justify-center">
-          <Button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
-            htmlType="submit"
-            onClick={() => onCilick(setLoading, parameter, router)}
-          >
-            新規登録
-          </Button>
-        </Form.Item>
-      </Form>
-      {loading ? <Loding /> : <div />}
-    </div>
+    <Container className='m-16'>
+      <form
+        onSubmit={form.onSubmit(values => { registerUser(setLoading, values, router) })}
+      >
+        <TextInput
+          label="名前"
+          placeholder="テスト太郎"
+          required
+          {...form.getInputProps('name')}
+          mb='lg'
+        />
+        <TextInput
+          label="メールアドレス"
+          placeholder="testtaro@example.com"
+          required
+            {...form.getInputProps('email')}
+          mb='lg'
+        />
+        <TextInput
+          label="電話番号"
+          placeholder="000-1111-2222"
+          required
+          {...form.getInputProps('phoneNumber')}
+          mb='lg'
+        />
+        <TextInput
+          label="パスワード"
+          placeholder="パスワード"
+          required
+          type="password"
+          {...form.getInputProps('password')}
+        />
+        <div className='pt-4'>
+          <Center>
+            <Button
+              type="submit"
+              className='bg-blue-500 hover:bg-blue-700 text-white font-bold'
+            >
+              新規登録
+            </Button>
+          </Center>
+        </div>
+      </form>
+      {loading ? <Loding /> : <></>}
+    </Container>
   );
 }

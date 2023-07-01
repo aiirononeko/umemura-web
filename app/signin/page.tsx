@@ -1,11 +1,11 @@
 "use client";
 import { Dispatch, SetStateAction, useState } from "react";
-import { Button, Form, Input, Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
 import { auth } from "../firebase/config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import { Loader, TextInput, Button, Container, Center } from '@mantine/core';
+import { useForm } from '@mantine/form';
 
 interface Parameter {
   email: string;
@@ -29,7 +29,7 @@ const Loding = () => {
     <div style={SpinCss}>
       <h1>Loding...</h1>
       <br />
-      <Spin indicator={<LoadingOutlined />} spinning={true} />
+      <Loader size='xl' />
     </div>
   );
 };
@@ -40,7 +40,7 @@ function setCurrentUser() {
   });
 }
 
-function onCilick(
+function checkUser(
   setLoading: Dispatch<SetStateAction<boolean>>,
   parameter: Parameter,
   router: AppRouterInstance
@@ -50,10 +50,13 @@ function onCilick(
 
   signInWithEmailAndPassword(auth, email, password)
     .then((_userCredential) => {
+      console.log('login');
       setCurrentUser();
+      window.alert("ログインしました");
       router.push("/");
     })
     .catch((error) => {
+      console.log('エラー')
       const errorCode = error.code;
       const errorMessage = error.message;
       window.alert(`${errorCode}: ${errorMessage}`);
@@ -66,41 +69,50 @@ function onCilick(
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [parameter, setParameter] = useState<Parameter>({
-    email: "",
-    password: "",
+  const form = useForm({
+    initialValues: {
+      email: '',
+      password: '',
+    } as Parameter,
+    validate: {
+      'email': value => (/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/).test(value) ?  null : 'メールアドレスを正しく入力してください',
+      'password': value => value.length < 6 ? 'パスワードは6文字以上で入力してください' : null,
+    },
   });
 
   return (
-    <div className="container px-8 pt-2">
-      <Form>
-        <Form.Item>
-          <Input
+    <>
+      <Container className='m-16'>
+        <form
+          onSubmit={form.onSubmit(values => { checkUser(setLoading, values, router) })}
+        >
+          <TextInput
+            label="メールアドレス"
             placeholder="メールアドレス"
-            onChange={(e) =>
-              setParameter({ ...parameter, email: e.target.value })
-            }
+            required
+            {...form.getInputProps('email')}
+            mb='lg'
           />
-        </Form.Item>
-        <Form.Item>
-          <Input.Password
+          <TextInput
+            label="パスワード"
             placeholder="パスワード"
-            onChange={(e) =>
-              setParameter({ ...parameter, password: e.target.value })
-            }
+            required
+            type="password"
+            {...form.getInputProps('password')}
           />
-        </Form.Item>
-        <Form.Item className="flex justify-center">
-          <Button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
-            htmlType="submit"
-            onClick={() => onCilick(setLoading, parameter, router)}
-          >
-            新規登録
-          </Button>
-        </Form.Item>
-      </Form>
-      {loading ? <Loding /> : <div />}
-    </div>
+          <div className='pt-4'>
+            <Center>
+              <Button
+                type="submit"
+                className='bg-blue-500 hover:bg-blue-700 text-white font-bold'
+              >
+                ログイン
+              </Button>
+            </Center>
+          </div>
+        </form>
+        {loading ? <Loding /> : <></>}
+      </Container>
+    </>
   );
 }
