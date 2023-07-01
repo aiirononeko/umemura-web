@@ -1,6 +1,7 @@
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { db } from "../firebase/config";
-import { doc, setDoc, collection, addDoc } from "firebase/firestore";
+import { doc, setDoc, collection, addDoc, getDocs } from "firebase/firestore";
+import { Dispatch, SetStateAction } from "react";
 
 export interface Customer {
   name: string;
@@ -25,6 +26,16 @@ export interface Stuff {
   password: string,
 };
 
+// FIXME: any型をなんとかしたい
+export async function getCollection(collectionName: string, setCollection: any) {
+  try {
+    const docRef = await getDocs(collection(db, collectionName));
+    const targetData = docRef.docs.map((doc) => doc.data());
+    setCollection(targetData);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
 
 // collectionが増えたら追加する
 export async function addCollectionWithUid(targetCollection: Customer | Course | Stuff, collectionName: string, uid: string) {
