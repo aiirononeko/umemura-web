@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { addCollection } from "@/app/_common/registerCollection";
-import { Course } from "@/app/_common/collection";
+import { type Course, addCollection } from "@/app/_common/collection";
 import { Loading } from "@/app/_common/loading";
 
 export default function Top() {

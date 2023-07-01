@@ -4,8 +4,7 @@ import { auth } from "../firebase/config";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { Dispatch, SetStateAction } from "react";
-import { type Customer, Stuff } from "./collection";
-import { addCollectionWithUid } from "./registerCollection";
+import { type Customer, type Stuff, addCollectionWithUid } from "./collection";
 
 function setCurrentUser() {
   auth.onAuthStateChanged((user) => {
