@@ -1,3 +1,4 @@
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { db } from "../firebase/config";
 import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 
@@ -12,7 +13,7 @@ export interface Course {
   title: string;
   time: string;
   description: string;
-  amount: number;
+  amount: string;
 }
 
 export interface Stuff {
@@ -37,13 +38,25 @@ export async function addCollectionWithUid(targetCollection: Customer | Course |
 }
 
 // collectionが増えたら追加する
-export async function addCollection(targetCollection: Customer | Course | Stuff, collectionName: string) {
+export async function addCollection(targetCollection: Customer | Course | Stuff, collectionName: string, setLoading?: React.Dispatch<React.SetStateAction<boolean>>, router?: AppRouterInstance, backPath?: string) {
+  if (setLoading) { setLoading(true) }
   try {
     await addDoc(collection(db, collectionName), {
       ...targetCollection,
     });
     window.alert('保存しました');
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!)
+    }
   } catch (e) {
     window.alert('保存に失敗しました');
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!)
+    }
   }
+}
+
+function offLoadingAndBack(setLoading: React.Dispatch<React.SetStateAction<boolean>>, router: AppRouterInstance, backPath: string) {
+  setLoading(false);
+  router.push(backPath);
 }
