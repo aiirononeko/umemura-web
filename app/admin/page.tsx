@@ -11,31 +11,39 @@ export default function Admin() {
       </Center>
       <Grid gutter="xl">
         <Grid.Col className="text-center">
-          <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64">
-            <Link href="/admin/reservation">
-              予約を管理する
-            </Link>
+          <Button
+            component={Link}
+            href="/admin/reservation"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
+          >
+            予約を管理する
           </Button>
         </Grid.Col>
         <Grid.Col className="text-center">
-          <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64">
-            <Link href="/admin/availableTime">
-              予約可能日時を管理する
-            </Link>
+          <Button
+            component={Link}
+            href="/admin/availableTime"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
+          >
+            予約可能日時を管理する
           </Button>
         </Grid.Col>
         <Grid.Col className="text-center">
-          <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64">
-            <Link href="/admin/course">
-              コースを管理する
-            </Link>
+          <Button
+            component={Link}
+            href="/admin/course"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
+          >
+            コースを管理する
           </Button>
         </Grid.Col>
         <Grid.Col className="text-center">
-          <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64">
-            <Link href="/admin/stuff">
-              スタッフを管理する
-            </Link>
+          <Button
+            component={Link}
+            href="/admin/stuff"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
+          >
+            スタッフを管理する
           </Button>
         </Grid.Col>
       </Grid>
