@@ -1,4 +1,4 @@
-import { Loader } from '@mantine/core';
+import { Loader } from "@mantine/core";
 
 export const SpinCss: React.CSSProperties = {
   width: "100vw",
@@ -17,7 +17,7 @@ export const Loading = () => {
     <div style={SpinCss}>
       <h1>Loding...</h1>
       <br />
-      <Loader size='xl' />
+      <Loader size="xl" />
     </div>
   );
 };

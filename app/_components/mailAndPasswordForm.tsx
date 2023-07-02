@@ -128,7 +128,11 @@ export default function MailAndPasswordForm(props: {
   });
 
   useEffect(() => {
-    setParameter({ ...parameter, name: name || "", phoneNumber: phoneNumber || 0 });
+    setParameter({
+      ...parameter,
+      name: name || "",
+      phoneNumber: phoneNumber || 0,
+    });
   }, [name, phoneNumber]);
 
   return (

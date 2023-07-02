@@ -47,17 +47,17 @@ const rows: Course[] = [
 
 export default function Top() {
   const [courses, setCourses] = useState<Course[]>([]);
-  getCollection('courses', setCourses);
+  getCollection("courses", setCourses);
 
   return (
     <>
       <Container className="m-auto">
         <Center>
-          <Title className='mb-12'>コース管理</Title>
+          <Title className="mb-12">コース管理</Title>
         </Center>
         <Table
           className="whitespace-nowrap"
-          verticalSpacing='xl'
+          verticalSpacing="xl"
           striped
           withBorder
           withColumnBorders
@@ -75,16 +75,16 @@ export default function Top() {
               <tr key={`${course.title}_${index}`}>
                 <td>{course.title}</td>
                 <td>{course.time}</td>
-                <td style={{ maxWidth: '40vw' }} className="truncate">{course.description}</td>
+                <td style={{ maxWidth: "40vw" }} className="truncate">
+                  {course.description}
+                </td>
                 <td>{course.amount}</td>
               </tr>
             ))}
           </tbody>
         </Table>
         <Center className="mt-12">
-          <Link href="/admin">
-            管理者画面ページ
-          </Link>
+          <Link href="/admin">管理者画面ページ</Link>
         </Center>
       </Container>
     </>

@@ -19,49 +19,54 @@ export default function Top() {
       amount: "",
     } as Course,
     validate: {
-      amount: value => (/^[1-9][0-9]*$/).test(value) ? null : "金額は半角数字で入力してください",
-    }
+      amount: (value) =>
+        /^[1-9][0-9]*$/.test(value) ? null : "金額は半角数字で入力してください",
+    },
   });
 
   return (
-    <Container className='m-auto ' size="xs">
+    <Container className="m-auto " size="xs">
       <Center>
-        <Title className='mb-12'>コース登録</Title>
+        <Title className="mb-12">コース登録</Title>
       </Center>
-      <form onSubmit={form.onSubmit(values => addCollection(values, 'courses', setLoading, router, 'admin/course'))}>
+      <form
+        onSubmit={form.onSubmit((values) =>
+          addCollection(values, "courses", setLoading, router, "admin/course")
+        )}
+      >
         <TextInput
           label="コース名"
           placeholder="ホニャホニャコース"
           required
-            {...form.getInputProps("title")}
-          mb='lg'
+          {...form.getInputProps("title")}
+          mb="lg"
         />
         <TextInput
           label="背術時間"
           placeholder="1時間"
           required
-            {...form.getInputProps("time")}
-          mb='lg'
+          {...form.getInputProps("time")}
+          mb="lg"
         />
         <TextInput
           label="コース説明"
           placeholder="ホニャホニャなコースです"
           required
-            {...form.getInputProps("description")}
-          mb='lg'
+          {...form.getInputProps("description")}
+          mb="lg"
         />
         <TextInput
           label="金額"
           placeholder="3000"
           required
-            {...form.getInputProps("amount")}
-          mb='lg'
+          {...form.getInputProps("amount")}
+          mb="lg"
         />
-        <div className='pt-4'>
+        <div className="pt-4">
           <Center>
             <Button
               type="submit"
-              className='bg-blue-500 hover:bg-blue-700 text-white font-bold'
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
             >
               登録
             </Button>
