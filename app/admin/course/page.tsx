@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { type Course, getCollection } from "@/app/_common/collection";
+import { type Course, getCollection } from "@/app/firebase/service/collection";
 import { Center, Container, Table, Title } from "@mantine/core";
 
 // firebaseが治り次第修正する

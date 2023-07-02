@@ -1,5 +1,5 @@
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-import { db } from "../firebase/config";
+import { db } from "../config";
 import { doc, setDoc, collection, addDoc, getDocs } from "firebase/firestore";
 
 export interface Customer {

@@ -7,7 +7,11 @@ import {
 } from "firebase/auth";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { Dispatch, SetStateAction } from "react";
-import { type Customer, type Stuff, addCollectionWithUid } from "./collection";
+import {
+  type Customer,
+  type Stuff,
+  addCollectionWithUid,
+} from "@/app/firebase/service/collection";
 
 function setCurrentUser() {
   auth.onAuthStateChanged((user) => {
