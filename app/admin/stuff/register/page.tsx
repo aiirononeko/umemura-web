@@ -114,15 +114,21 @@ export default function Top() {
           mb="lg"
         />
         <Center className="mt-4">
-          <Button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
-          >
-            登録
-          </Button>
-        </Center>
-        <Center className="mt-4">
-          <Link href="/admin/stuff">スタッフ管理ページへ</Link>
+          <Group>
+            <Button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
+            >
+              登録
+            </Button>
+            <Button
+              component={Link}
+              href="/admin/stuff"
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold"
+            >
+              戻る
+            </Button>
+          </Group>
         </Center>
       </form>
       {loading ? <Loading /> : <></>}

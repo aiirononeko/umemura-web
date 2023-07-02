@@ -17,7 +17,7 @@ export default function Top() {
   return (
     <Container className="m-auto">
       <Center>
-        <Title>スタッフ管理ページ</Title>
+        <Title>スタッフ管理</Title>
       </Center>
       <Center>
         <Button
