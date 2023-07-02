@@ -10,17 +10,25 @@ import {
   where,
   getDocs,
   doc,
+  DocumentSnapshot,
 } from "firebase/firestore";
 import { set, add, format } from "date-fns";
 
 export default function AvailableTimeRegister() {
-  const [mondayAvailableTimes, setMondayAvailableTimes] = useState();
-  const [tuesdayAvailableTimes, setTuesdayAvailableTimes] = useState();
-  const [wednesdayAvailableTimes, setWednesdayAvailableTimes] = useState();
-  const [thirdsdayAvailableTimes, setThirdsdayAvailableTimes] = useState();
-  const [fridayAvailableTimes, setFridayAvailableTimes] = useState();
-  const [saturdayAvailableTimes, setSaturdayAvailableTimes] = useState();
-  const [sundayAvailableTimes, setSundayAvailableTimes] = useState();
+  const [mondayAvailableTimes, setMondayAvailableTimes] =
+    useState<DocumentSnapshot[]>();
+  const [tuesdayAvailableTimes, setTuesdayAvailableTimes] =
+    useState<DocumentSnapshot[]>();
+  const [wednesdayAvailableTimes, setWednesdayAvailableTimes] =
+    useState<DocumentSnapshot[]>();
+  const [thirdsdayAvailableTimes, setThirdsdayAvailableTimes] =
+    useState<DocumentSnapshot[]>();
+  const [fridayAvailableTimes, setFridayAvailableTimes] =
+    useState<DocumentSnapshot[]>();
+  const [saturdayAvailableTimes, setSaturdayAvailableTimes] =
+    useState<DocumentSnapshot[]>();
+  const [sundayAvailableTimes, setSundayAvailableTimes] =
+    useState<DocumentSnapshot[]>();
 
   const getAvailableTimes = async (date: string) => {
     try {
