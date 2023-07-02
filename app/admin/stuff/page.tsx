@@ -29,7 +29,7 @@ export default function Top() {
     <main className="flex min-h-screen flex-col items-center p-24">
       <h1 className="text-4xl font-bold pb-10">スタッフ管理ページ</h1>
       <Link href="/admin/stuff/register" className="pb-5">
-        スタッフを登録する
+        スタッフ登録
       </Link>
       <table className="table-auto">
         <thead>
