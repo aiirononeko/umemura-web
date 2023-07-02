@@ -1,57 +1,96 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { db } from "../../firebase/config";
-import { collection, getDocs } from "firebase/firestore";
+import { useState } from "react";
+import { type Stuff, setDocuments } from "@/app/firebase/service/collection";
+import { Center, Container, Table, Title } from "@mantine/core";
+
+const rows: Stuff[] = [
+  {
+    firstName: "太郎",
+    lastName: "佐藤",
+    gender: "男性",
+    profile: "全力で頑張ります",
+    email: "taro@example.com",
+    password: "password",
+  },
+  {
+    firstName: "太郎",
+    lastName: "佐藤",
+    gender: "男性",
+    profile: "全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります",
+    email: "taro@example.com",
+    password: "password",
+  },
+  {
+    firstName: "太郎",
+    lastName: "佐藤",
+    gender: "男性",
+    profile: "全力で頑張ります",
+    email: "taro@example.com",
+    password: "password",
+  },
+  {
+    firstName: "太郎",
+    lastName: "佐藤",
+    gender: "男性",
+    profile: "全力で頑張ります",
+    email: "taro@example.com",
+    password: "password",
+  },
+  {
+    firstName: "太郎",
+    lastName: "佐藤",
+    gender: "男性",
+    profile: "全力で頑張ります",
+    email: "taro@example.com",
+    password: "password",
+  },
+]
 
 export default function Top() {
-  const [stuffs, setStuffs] = useState([]);
-
-  const getStuffs = async () => {
-    try {
-      const stuffs: any = [];
-      const docRef = await getDocs(collection(db, "stuffs"));
-      docRef.forEach((doc) => {
-        stuffs.push(doc.data());
-      });
-      setStuffs(stuffs);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
-
-  useEffect(() => {
-    getStuffs();
-  }, []);
+  const [stuffs, setStuffs] = useState<Stuff[]>([]);
+  setDocuments('stuffs', setStuffs)
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <h1 className="text-4xl font-bold pb-10">スタッフ管理ページ</h1>
-      <Link href="/admin/stuff/register" className="pb-5">
-        スタッフ登録
-      </Link>
-      <table className="table-auto">
+    <Container className="m-auto">
+      <Center>
+        <Title className="mb-12">スタッフ管理ページ</Title>
+      </Center>
+      <Center>
+        <Link href="/admin/stuff/register" className="pb-5">
+          スタッフ登録
+        </Link>
+      </Center>
+      <Table
+        className="whitespace-nowrap"
+        verticalSpacing="xl"
+        striped
+        withBorder
+        withColumnBorders
+      >
         <thead>
           <tr>
-            <th className="px-20 py-6">スタッフ名</th>
-            <th className="px-20 py-6">性別</th>
-            <th className="px-20 py-6">プロフィール</th>
+            <th>スタッフ名</th>
+            <th>性別</th>
+            <th>プロフィール</th>
           </tr>
         </thead>
-        {stuffs.map((stuff: any, index) => (
-          <tbody key={`${stuff.firstName}_${stuff.lastName}_${index}`}>
-            <tr>
-              <td className="border px-4 py-2">{`${stuff.lastName} ${stuff.firstName}`}</td>
-              <td className="border px-4 py-2">{stuff.gender}</td>
-              <td className="border px-4 py-2">{stuff.profile}</td>
+        <tbody>
+          {rows.map((stuff: Stuff, index) => (
+            <tr key={index}>
+              <td>{`${stuff.lastName} ${stuff.firstName}`}</td>
+              <td>{stuff.gender}</td>
+              <td style={{ maxWidth: "40vw" }} className="truncate">
+                {stuff.profile}
+              </td>
             </tr>
-          </tbody>
-        ))}
-      </table>
-      <Link href="/admin" className="pt-10">
-        管理者ページへ
-      </Link>
-    </main>
+          ))}
+        </tbody>
+      </Table>
+      <Center className="mt-12">
+        <Link href="/admin">管理者画面ページ</Link>
+      </Center>
+    </Container>
   );
 }

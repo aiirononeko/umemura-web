@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { type Course, getCollection } from "@/app/firebase/service/collection";
+import { type Course, setDocuments } from "../../firebase/service/collection";
 import { Center, Container, Table, Title } from "@mantine/core";
 
 // firebaseが治り次第修正する
@@ -47,7 +47,7 @@ const rows: Course[] = [
 
 export default function Top() {
   const [courses, setCourses] = useState<Course[]>([]);
-  getCollection("courses", setCourses);
+  setDocuments("courses", setCourses);
 
   return (
     <>
