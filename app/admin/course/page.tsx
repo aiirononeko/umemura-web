@@ -5,46 +5,6 @@ import { useState } from "react";
 import { type Course, setDocuments } from "../../firebase/service/collection";
 import { Center, Container, Table, Title } from "@mantine/core";
 
-// firebaseが治り次第修正する
-const rows: Course[] = [
-  {
-    title: "コース名",
-    time: "背術時間",
-    description: "コース説明",
-    amount: "金額",
-  },
-  {
-    title: "コース名",
-    time: "背術時間",
-    description: "adjf:aldjkf:alkdjf:alkjdf:alkdjf",
-    amount: "金額",
-  },
-  {
-    title: "コース名",
-    time: "背術時間",
-    description: "なにぬねの",
-    amount: "金額",
-  },
-  {
-    title: "コース名",
-    time: "背術時間",
-    description: "はひふへほ",
-    amount: "金額",
-  },
-  {
-    title: "コース名",
-    time: "背術時間",
-    description: "asd:lkfja:sdlfj:alksdjfafadfadfadfadfadfadfadsfadfads:",
-    amount: "金額",
-  },
-  {
-    title: "コース名",
-    time: "背術時間",
-    description: "asdfkja:lsdfjka:lsdkjfa:lkdsjfa:",
-    amount: "金額",
-  },
-];
-
 export default function Top() {
   const [courses, setCourses] = useState<Course[]>([]);
   setDocuments("courses", setCourses);
@@ -71,7 +31,7 @@ export default function Top() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((course: Course, index) => (
+            {courses.map((course: Course, index) => (
               <tr key={`${course.title}_${index}`}>
                 <td>{course.title}</td>
                 <td>{course.time}</td>
