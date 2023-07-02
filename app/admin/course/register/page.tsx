@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type Course, addCollection } from "@/app/_common/collection";
+import { type Course, addDocument } from "../../../firebase/service/collection"
 import { Container, Title, Center, TextInput, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
@@ -31,7 +31,7 @@ export default function Top() {
       </Center>
       <form
         onSubmit={form.onSubmit((values) =>
-          addCollection(values, "courses", setLoading, router, "admin/course")
+          addDocument(values, "courses", setLoading, router, "admin/course")
         )}
       >
         <TextInput

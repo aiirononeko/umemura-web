@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TextInput, Button, Container, Center } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { Loading } from "../_common/loading";
-import { type Customer } from "../_common/collection";
-import { registerAuthenticate } from "../_common/authentication";
+import { Loading } from "../firebase/service/loading";
+import { type Customer } from "../firebase/service/collection";
+import { registerAuthenticate } from "../firebase/service/authentication";
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);

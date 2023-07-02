@@ -29,7 +29,7 @@ export interface Stuff {
 type Collections = Customer | Course | Stuff;
 
 // FIXME: any型をなんとかしたい
-export async function getCollection(
+export async function setDocuments(
   collectionName: string,
   setCollection: any
 ) {
@@ -42,16 +42,7 @@ export async function getCollection(
   }
 }
 
-export async function getDocuments(collectionName: string): Promise<any> {
-  try {
-    const docRef = await getDocs(collection(db, collectionName));
-    return docRef.docs.map((doc) => doc.data());
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
-
-export async function addCollectionWithUid(
+export async function addDocumentWithUid(
   targetCollection: Collections,
   collectionName: string,
   uid: string
@@ -65,7 +56,7 @@ export async function addCollectionWithUid(
   }
 }
 
-export async function addCollection(
+export async function addDocument(
   targetCollection: Collections,
   collectionName: string,
   setLoading?: React.Dispatch<React.SetStateAction<boolean>>,

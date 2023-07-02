@@ -13,9 +13,9 @@ import {
   Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { type Stuff } from "../../../_common/collection";
-import { registerAuthenticate } from "../../../_common/authentication";
-import { Loading } from "@/app/_common/loading";
+import { type Stuff } from "../../../firebase/service/collection";
+import { registerAuthenticate } from "../../../firebase/service/authentication";
+import { Loading } from "../../../firebase/service/loading";
 
 const genderData = [
   { value: "男性", label: "男性" },

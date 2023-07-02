@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { TextInput, Button, Container, Center } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { Loading } from "../_common/loading";
-import { authenticate } from "../_common/authentication";
+import { Loading } from "../firebase/service/loading";
+import { authenticate } from "../firebase/service/authentication";
 import { useRouter } from "next/navigation";
 
 interface Parameter {

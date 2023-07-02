@@ -1,6 +1,6 @@
 "use client";
 
-import { auth } from "../firebase/config";
+import { auth } from "../config";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -10,7 +10,7 @@ import { Dispatch, SetStateAction } from "react";
 import {
   type Customer,
   type Stuff,
-  addCollectionWithUid,
+  addDocumentWithUid,
 } from "@/app/firebase/service/collection";
 
 function setCurrentUser() {
@@ -57,7 +57,7 @@ export function registerAuthenticate(
     .then((userCredential) => {
       const user = userCredential.user;
       const uid = user.uid;
-      addCollectionWithUid(collection, collectionName, uid);
+      addDocumentWithUid(collection, collectionName, uid);
       if (haveToSetUser) {
         setCurrentUser();
       }
