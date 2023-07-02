@@ -12,7 +12,7 @@ export default function Top() {
     getDocuments("stuffs").then((res) => {
       setStuffs(res as Stuff[]);
     });
-  }, [])
+  }, []);
 
   return (
     <Container className="m-auto">
