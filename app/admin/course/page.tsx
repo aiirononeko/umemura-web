@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { type Course, setDocuments } from "../../firebase/service/collection";
+import { useEffect, useState } from "react";
+import { type Course, getDocuments } from "../../firebase/service/collection";
 import { Center, Container, Table, Title } from "@mantine/core";
 
 export default function Top() {
   const [courses, setCourses] = useState<Course[]>([]);
-  setDocuments("courses", setCourses);
+  useEffect(() => {
+    getDocuments("courses").then((courses) => {
+      setCourses(courses as Course[]);
+    });
+  }, []);
 
   return (
     <>

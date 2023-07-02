@@ -1,56 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { type Stuff, setDocuments } from "@/app/firebase/service/collection";
+import { useEffect, useState } from "react";
+import { type Stuff, getDocuments } from "@/app/firebase/service/collection";
 import { Center, Container, Table, Title } from "@mantine/core";
-
-const rows: Stuff[] = [
-  {
-    firstName: "太郎",
-    lastName: "佐藤",
-    gender: "男性",
-    profile: "全力で頑張ります",
-    email: "taro@example.com",
-    password: "password",
-  },
-  {
-    firstName: "太郎",
-    lastName: "佐藤",
-    gender: "男性",
-    profile: "全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります全力で頑張ります",
-    email: "taro@example.com",
-    password: "password",
-  },
-  {
-    firstName: "太郎",
-    lastName: "佐藤",
-    gender: "男性",
-    profile: "全力で頑張ります",
-    email: "taro@example.com",
-    password: "password",
-  },
-  {
-    firstName: "太郎",
-    lastName: "佐藤",
-    gender: "男性",
-    profile: "全力で頑張ります",
-    email: "taro@example.com",
-    password: "password",
-  },
-  {
-    firstName: "太郎",
-    lastName: "佐藤",
-    gender: "男性",
-    profile: "全力で頑張ります",
-    email: "taro@example.com",
-    password: "password",
-  },
-]
 
 export default function Top() {
   const [stuffs, setStuffs] = useState<Stuff[]>([]);
-  setDocuments('stuffs', setStuffs)
+
+  useEffect(()=> {
+    getDocuments("stuffs").then((res) => {
+      setStuffs(res as Stuff[]);
+    });
+  }, [])
 
   return (
     <Container className="m-auto">
@@ -77,7 +39,7 @@ export default function Top() {
           </tr>
         </thead>
         <tbody>
-          {rows.map((stuff: Stuff, index) => (
+          {stuffs.map((stuff: Stuff, index) => (
             <tr key={index}>
               <td>{`${stuff.lastName} ${stuff.firstName}`}</td>
               <td>{stuff.gender}</td>

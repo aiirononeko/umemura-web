@@ -11,6 +11,7 @@ import {
   Group,
   Select,
   Title,
+  Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { type Stuff } from "../../../firebase/service/collection";
@@ -104,7 +105,7 @@ export default function Top() {
           {...form.getInputProps("password")}
           mb="lg"
         />
-        <TextInput
+        <Textarea
           size="xs"
           label="プロフィール"
           placeholder="プロフィール"
