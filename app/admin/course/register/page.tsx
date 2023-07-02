@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type Course, addDocument } from "../../../firebase/service/collection"
-import { Container, Title, Center, TextInput, Button } from "@mantine/core";
+import { Container, Title, Center, TextInput, Button, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
-import { Loading } from "@/app/_common/loading";
+import { Loading } from "../../../firebase/service/loading";
 
 export default function Top() {
   const router = useRouter();
@@ -64,15 +64,21 @@ export default function Top() {
         />
         <div className="pt-4">
           <Center>
-            <Button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
-            >
-              登録
-            </Button>
-          </Center>
-          <Center className="mt-4">
-            <Link href="/admin/course">コース管理ページへ</Link>
+            <Group>
+              <Button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
+              >
+                登録
+              </Button>
+              <Button
+                component={Link}
+                href="/admin/course"
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold"
+              >
+                戻る
+              </Button>
+            </Group>
           </Center>
         </div>
       </form>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { type Stuff, getDocuments } from "@/app/firebase/service/collection";
-import { Center, Container, Table, Title } from "@mantine/core";
+import { Button, Center, Container, Table, Title } from "@mantine/core";
 
 export default function Top() {
   const [stuffs, setStuffs] = useState<Stuff[]>([]);
@@ -17,12 +17,16 @@ export default function Top() {
   return (
     <Container className="m-auto">
       <Center>
-        <Title className="mb-12">スタッフ管理ページ</Title>
+        <Title>スタッフ管理ページ</Title>
       </Center>
       <Center>
-        <Link href="/admin/stuff/register" className="pb-5">
+        <Button
+          component={Link}
+          href="/admin/stuff/register"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-4"
+        >
           スタッフ登録
-        </Link>
+        </Button>
       </Center>
       <Table
         className="whitespace-nowrap"
@@ -50,8 +54,14 @@ export default function Top() {
           ))}
         </tbody>
       </Table>
-      <Center className="mt-12">
-        <Link href="/admin">管理者画面ページ</Link>
+      <Center>
+        <Button
+          component={Link}
+          href="/admin"
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold my-4"
+        >
+          戻る
+        </Button>
       </Center>
     </Container>
   );
