@@ -1,7 +1,6 @@
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { db } from "../firebase/config";
 import { doc, setDoc, collection, addDoc, getDocs } from "firebase/firestore";
-import { Dispatch, SetStateAction } from "react";
 
 export interface Customer {
   name: string;
@@ -26,6 +25,9 @@ export interface Stuff {
   password: string,
 };
 
+// collectionが増えたらここに追加
+type Collections = Customer | Course | Stuff;
+
 // FIXME: any型をなんとかしたい
 export async function getCollection(collectionName: string, setCollection: any) {
   try {
@@ -37,8 +39,7 @@ export async function getCollection(collectionName: string, setCollection: any) 
   }
 }
 
-// collectionが増えたら追加する
-export async function addCollectionWithUid(targetCollection: Customer | Course | Stuff, collectionName: string, uid: string) {
+export async function addCollectionWithUid(targetCollection: Collections, collectionName: string, uid: string) {
   try {
     await setDoc(doc(db, collectionName, uid), {
       ...targetCollection,
@@ -48,8 +49,7 @@ export async function addCollectionWithUid(targetCollection: Customer | Course |
   }
 }
 
-// collectionが増えたら追加する
-export async function addCollection(targetCollection: Customer | Course | Stuff, collectionName: string, setLoading?: React.Dispatch<React.SetStateAction<boolean>>, router?: AppRouterInstance, backPath?: string) {
+export async function addCollection(targetCollection: Collections, collectionName: string, setLoading?: React.Dispatch<React.SetStateAction<boolean>>, router?: AppRouterInstance, backPath?: string) {
   if (setLoading) { setLoading(true) }
   try {
     await addDoc(collection(db, collectionName), {
