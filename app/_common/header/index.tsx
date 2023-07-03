@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
+import { auth } from "@/app/firebase/config";
 
 const HEADER_HEIGHT = rem(60);
 
@@ -99,12 +100,17 @@ interface HeaderResponsiveProps {
   links: { link: string; label: string }[];
 }
 
+const currentUser = auth.currentUser;
+
 const initLinks: HeaderResponsiveProps = {
   links: [
-    { link: "/", label: "ホーム" },
-    { link: "/signup", label: "新規会員登録" },
-    { link: "/signin", label: "ログイン" },
-  ],
+    { link: "/", label: "ホーム" }
+  ].concat(
+    currentUser ? [] : [
+      { link: "/signin", label: "ログイン" },
+      { link: "/signup", label: "新規登録" },
+    ]
+  ),
 };
 
 export default function HeaderResponsive() {
