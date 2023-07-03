@@ -3,10 +3,10 @@ import { db } from "../config";
 import { doc, setDoc, collection, addDoc, getDocs, DocumentData } from "firebase/firestore";
 
 export interface Customer {
-  name: string;
+  firstName: string;
+  lastName: string;
   phoneNumber: string;
   email: string;
-  password: string;
 }
 
 export interface Course {
@@ -22,13 +22,13 @@ export interface Stuff {
   gender: string;
   profile: string;
   email: string;
-  password: string;
 }
 
 // collectionが増えたらここに追加
 type Collections = Customer | Course | Stuff;
 
 export async function getDocuments(collectionName: string): Promise<DocumentData[]> {
+  console.log('called');
   try {
     const docRef = await getDocs(collection(db, collectionName));
     const documents = docRef.docs.map((doc) => doc.data());
@@ -60,6 +60,7 @@ export async function addDocument(
   router?: AppRouterInstance,
   backPath?: string
 ) {
+  console.log('called');
   if (setLoading) {
     setLoading(true);
   }

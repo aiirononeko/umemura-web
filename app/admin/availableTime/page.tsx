@@ -31,6 +31,7 @@ export default function AvailableTimeRegister() {
     useState<DocumentSnapshot[]>();
 
   const getAvailableTimes = async (date: string) => {
+    console.log('called');
     try {
       const availableTimes: any = [];
       const q = query(

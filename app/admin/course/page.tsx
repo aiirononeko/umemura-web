@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { type Course, getDocuments } from "../../firebase/service/collection";
-import { Box, Button, Center, Container, Grid, Group, Table, Title } from "@mantine/core";
+import { Button, Center, Container, Table, Title } from "@mantine/core";
 
 export default function Top() {
   const [courses, setCourses] = useState<Course[]>([]);

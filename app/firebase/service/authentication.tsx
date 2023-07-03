@@ -27,6 +27,7 @@ export function authenticate(
   backPath: string
 ) {
   setLoading(true);
+  console.log('called');
   signInWithEmailAndPassword(auth, email, password)
     .then((_userCredential) => {
       setCurrentUser();
@@ -46,13 +47,15 @@ export function authenticate(
 export function registerAuthenticate(
   collection: Customer | Stuff,
   collectionName: string,
+  password: string,
   setLoading: Dispatch<SetStateAction<boolean>>,
   router: AppRouterInstance,
   backPath: string,
   haveToSetUser: boolean
 ) {
-  const { email, password } = collection;
+  const { email } = collection;
   setLoading(true);
+  console.log('called');
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;

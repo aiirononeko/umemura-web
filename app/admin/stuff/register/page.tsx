@@ -14,9 +14,26 @@ import {
   Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { type Stuff } from "../../../firebase/service/collection";
 import { registerAuthenticate } from "../../../firebase/service/authentication";
 import { Loading } from "../../../firebase/service/loading";
+import { Stuff } from "@/app/firebase/service/collection";
+
+function builderStuff(values: {
+  lastName: string;
+  firstName: string;
+  gender: string;
+  profile: string;
+  email: string;
+  password: string;
+}): Stuff {
+  return {
+    lastName: values.lastName,
+    firstName: values.firstName,
+    gender: values.gender,
+    profile: values.profile,
+    email: values.email,
+  } as Stuff;
+}
 
 const genderData = [
   { value: "男性", label: "男性" },
@@ -32,7 +49,7 @@ export default function Top() {
       profile: "",
       email: "",
       password: "",
-    } as Stuff,
+    },
     validate: {
       email: (value) =>
         /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)
@@ -51,10 +68,10 @@ export default function Top() {
       </Center>
       <form
         onSubmit={form.onSubmit((values) => {
-          console.log(values);
           registerAuthenticate(
-            values,
+            builderStuff(values),
             "stuffs",
+            values.password,
             setLoading,
             router,
             "/admin/stuff",
