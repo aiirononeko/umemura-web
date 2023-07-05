@@ -76,7 +76,7 @@ export default function AvailableTimeRegister() {
               </Button>
               <Button
                 component={Link}
-                href="/admin/course"
+                href="/admin"
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold"
               >
                 戻る

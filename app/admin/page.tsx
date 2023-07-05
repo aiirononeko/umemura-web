@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button, Center, Container, Grid, Title } from "@mantine/core";
 import Link from "next/link";
@@ -26,6 +26,15 @@ export default function Admin() {
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
           >
             予約可能日時を管理する
+          </Button>
+        </Grid.Col>
+        <Grid.Col className="text-center">
+          <Button
+            component={Link}
+            href="/admin/stuff/profile"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
+          >
+            プロフィールを管理する
           </Button>
         </Grid.Col>
         <Grid.Col className="text-center">

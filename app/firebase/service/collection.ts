@@ -24,11 +24,11 @@ export interface Course {
 }
 
 export interface Stuff {
-  firstName: string;
-  lastName: string;
-  gender: string;
-  profile: string;
-  email: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  profile?: string;
+  email?: string;
 }
 
 export interface AvailableTime {
@@ -114,6 +114,39 @@ export async function addSubCollectionDocument(
       {
         ...data,
       }
+    );
+    window.alert("保存しました");
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  } catch (e) {
+    window.alert("保存に失敗しました");
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  }
+}
+
+export async function updateDocument(
+  data: Collections,
+  collectionName: string,
+  documentId: string,
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>,
+  router?: AppRouterInstance,
+  backPath?: string
+) {
+  console.log("called");
+  if (setLoading) {
+    setLoading(true);
+  }
+  try {
+    const docRef = doc(db, collectionName, documentId);
+    await setDoc(
+      docRef,
+      {
+        ...data,
+      },
+      { merge: true }
     );
     window.alert("保存しました");
     if (setLoading) {
