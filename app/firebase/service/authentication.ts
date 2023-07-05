@@ -49,7 +49,7 @@ export function authenticate(
 }
 
 export function registerAuthenticate(
-  collection: Customer | Stuff,
+  collection: Customer,
   collectionName: string,
   password: string,
   setLoading: Dispatch<SetStateAction<boolean>>,
@@ -65,6 +65,35 @@ export function registerAuthenticate(
       const user = userCredential.user;
       const uid = user.uid;
       addDocumentWithUid(collection, collectionName, uid);
+      if (haveToSetUser) {
+        setCurrentUser();
+      }
+      window.alert("登録が完了しました。");
+      router.push(backPath);
+    })
+    .catch((_error) => {
+      window.alert(`既にユーザーが存在します`);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}
+
+export function registerStuffWithSendingEmail(
+  data: Stuff,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  router: AppRouterInstance,
+  backPath: string,
+  haveToSetUser: boolean
+) {
+  const { email } = data;
+  setLoading(true);
+  console.log("called");
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      const uid = user.uid;
+      addDocumentWithUid(data, "stuffs", uid);
       if (haveToSetUser) {
         setCurrentUser();
       }

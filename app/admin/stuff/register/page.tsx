@@ -11,29 +11,10 @@ import {
   Group,
   Select,
   Title,
-  Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { registerAuthenticate } from "../../../firebase/service/authentication";
+import { registerStuffWithSendingEmail } from "../../../firebase/service/authentication";
 import { Loading } from "../../../firebase/service/loading";
-import { Stuff } from "@/app/firebase/service/collection";
-
-function builderStuff(values: {
-  lastName: string;
-  firstName: string;
-  gender: string;
-  profile: string;
-  email: string;
-  password: string;
-}): Stuff {
-  return {
-    lastName: values.lastName,
-    firstName: values.firstName,
-    gender: values.gender,
-    profile: values.profile,
-    email: values.email,
-  } as Stuff;
-}
 
 const genderData = [
   { value: "男性", label: "男性" },
@@ -46,17 +27,13 @@ export default function Top() {
       lastName: "",
       firstName: "",
       gender: "男性",
-      profile: "",
       email: "",
-      password: "",
     },
     validate: {
       email: (value) =>
         /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)
           ? null
           : "メールアドレスを正しく入力してください",
-      password: (value) =>
-        value.length < 6 ? "パスワードは6文字以上で入力してください" : null,
     },
   });
   const [loading, setLoading] = useState(false);
@@ -68,10 +45,8 @@ export default function Top() {
       </Center>
       <form
         onSubmit={form.onSubmit((values) => {
-          registerAuthenticate(
-            builderStuff(values),
-            "stuffs",
-            values.password,
+          registerStuffWithSendingEmail(
+            values,
             setLoading,
             router,
             "/admin/stuff",
@@ -111,23 +86,6 @@ export default function Top() {
           placeholder="メールアドレス"
           required
           {...form.getInputProps("email")}
-          mb="lg"
-        />
-        <TextInput
-          size="xs"
-          label="パスワード"
-          placeholder="パスワード"
-          required
-          type="password"
-          {...form.getInputProps("password")}
-          mb="lg"
-        />
-        <Textarea
-          size="xs"
-          label="プロフィール"
-          placeholder="プロフィール"
-          required
-          {...form.getInputProps("profile")}
           mb="lg"
         />
         <Center className="mt-4">
