@@ -1,6 +1,13 @@
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { db } from "../config";
-import { doc, setDoc, collection, addDoc, getDocs, DocumentData } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  addDoc,
+  getDocs,
+  DocumentData,
+} from "firebase/firestore";
 
 export interface Customer {
   firstName: string;
@@ -24,11 +31,19 @@ export interface Stuff {
   email: string;
 }
 
-// collectionが増えたらここに追加
-type Collections = Customer | Course | Stuff;
+export interface AvailableTime {
+  date: string;
+  startTime: string;
+  endTime: string;
+}
 
-export async function getDocuments(collectionName: string): Promise<DocumentData[]> {
-  console.log('called');
+// collectionが増えたらここに追加
+type Collections = Customer | Course | Stuff | AvailableTime;
+
+export async function getDocuments(
+  collectionName: string
+): Promise<DocumentData[]> {
+  console.log("called");
   try {
     const docRef = await getDocs(collection(db, collectionName));
     const documents = docRef.docs.map((doc) => doc.data());
@@ -40,13 +55,13 @@ export async function getDocuments(collectionName: string): Promise<DocumentData
 }
 
 export async function addDocumentWithUid(
-  targetCollection: Collections,
+  data: Collections,
   collectionName: string,
   uid: string
 ) {
   try {
     await setDoc(doc(db, collectionName, uid), {
-      ...targetCollection,
+      ...data,
     });
   } catch (error) {
     window.alert(error);
@@ -54,20 +69,52 @@ export async function addDocumentWithUid(
 }
 
 export async function addDocument(
-  targetCollection: Collections,
+  data: Collections,
   collectionName: string,
   setLoading?: React.Dispatch<React.SetStateAction<boolean>>,
   router?: AppRouterInstance,
   backPath?: string
 ) {
-  console.log('called');
+  console.log("called");
   if (setLoading) {
     setLoading(true);
   }
   try {
     await addDoc(collection(db, collectionName), {
-      ...targetCollection,
+      ...data,
     });
+    window.alert("保存しました");
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  } catch (e) {
+    window.alert("保存に失敗しました");
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  }
+}
+
+export async function addSubCollectionDocument(
+  data: Collections,
+  collectionName: string,
+  documentId: string,
+  subCollectionName: string,
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>,
+  router?: AppRouterInstance,
+  backPath?: string
+) {
+  console.log("called");
+  if (setLoading) {
+    setLoading(true);
+  }
+  try {
+    await addDoc(
+      collection(db, collectionName, documentId, subCollectionName),
+      {
+        ...data,
+      }
+    );
     window.alert("保存しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);

@@ -19,6 +19,10 @@ function setCurrentUser() {
   });
 }
 
+export function getUid() {
+  return auth.currentUser?.uid;
+}
+
 export function authenticate(
   email: string,
   password: string,
@@ -27,7 +31,7 @@ export function authenticate(
   backPath: string
 ) {
   setLoading(true);
-  console.log('called');
+  console.log("called");
   signInWithEmailAndPassword(auth, email, password)
     .then((_userCredential) => {
       setCurrentUser();
@@ -55,7 +59,7 @@ export function registerAuthenticate(
 ) {
   const { email } = collection;
   setLoading(true);
-  console.log('called');
+  console.log("called");
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
