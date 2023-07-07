@@ -103,13 +103,13 @@ interface HeaderResponsiveProps {
 const currentUser = auth.currentUser;
 
 const initLinks: HeaderResponsiveProps = {
-  links: [
-    { link: "/", label: "ホーム" }
-  ].concat(
-    currentUser ? [] : [
-      { link: "/signin", label: "ログイン" },
-      { link: "/signup", label: "新規登録" },
-    ]
+  links: [{ link: "/", label: "ホーム" }].concat(
+    currentUser
+      ? []
+      : [
+          { link: "/signin", label: "ログイン" },
+          { link: "/signup", label: "新規登録" },
+        ]
   ),
 };
 
@@ -136,7 +136,7 @@ export default function HeaderResponsive() {
   ));
 
   return (
-    <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
+    <Header height={HEADER_HEIGHT} mb={35} className={classes.root}>
       <Container className={classes.header}>
         <Group spacing={5} className={classes.links}>
           {items}

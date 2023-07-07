@@ -2,11 +2,22 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type Course, addDocument } from "../../../firebase/service/collection"
-import { Container, Title, Center, TextInput, Button, Group } from "@mantine/core";
+import {
+  type Course,
+  addSubCollectionDocument,
+} from "../../../firebase/service/collection";
+import {
+  Container,
+  Title,
+  Center,
+  TextInput,
+  Button,
+  Group,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
 import { Loading } from "../../../firebase/service/loading";
+import { getUid } from "@/app/firebase/service/authentication";
 
 export default function Top() {
   const router = useRouter();
@@ -24,6 +35,8 @@ export default function Top() {
     },
   });
 
+  const uid = getUid();
+
   return (
     <Container className="m-auto " size="xs">
       <Center>
@@ -31,7 +44,15 @@ export default function Top() {
       </Center>
       <form
         onSubmit={form.onSubmit((values) =>
-          addDocument(values, "courses", setLoading, router, "admin/course")
+          addSubCollectionDocument(
+            values,
+            "stuffs",
+            uid ?? "",
+            "courses",
+            setLoading,
+            router,
+            "admin/course"
+          )
         )}
       >
         <TextInput

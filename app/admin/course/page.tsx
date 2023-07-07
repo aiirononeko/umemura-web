@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { type Course, getDocuments } from "../../firebase/service/collection";
+import {
+  type Course,
+  getSubcollectionDocuments,
+} from "../../firebase/service/collection";
 import { Button, Center, Container, Table, Title } from "@mantine/core";
+import { getUid } from "@/app/firebase/service/authentication";
 
 export default function Top() {
   const [courses, setCourses] = useState<Course[]>([]);
+  const uid = getUid();
+
   useEffect(() => {
-    getDocuments("courses").then((courses) => {
-      setCourses(courses as Course[]);
-    });
+    getSubcollectionDocuments("stuffs", uid ?? "", "courses").then(
+      (courses) => {
+        setCourses(courses as Course[]);
+      }
+    );
   }, []);
 
   return (

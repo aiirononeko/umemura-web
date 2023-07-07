@@ -24,6 +24,7 @@ export interface Course {
 }
 
 export interface Stuff {
+  id: string;
   firstName?: string;
   lastName?: string;
   gender?: string;
@@ -37,8 +38,17 @@ export interface AvailableTime {
   endTime: string;
 }
 
+export interface Reservation {
+  customerId: string;
+  stuffId: string;
+  courseId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
 // collectionが増えたらここに追加
-type Collections = Customer | Course | Stuff | AvailableTime;
+type Collections = Customer | Course | Stuff | AvailableTime | Reservation;
 
 export async function getDocuments(
   collectionName: string
@@ -46,6 +56,24 @@ export async function getDocuments(
   console.log("called");
   try {
     const docRef = await getDocs(collection(db, collectionName));
+    const documents = docRef.docs.map((doc) => doc.data());
+    return documents;
+  } catch (e) {
+    console.error("Error adding document: ", e);
+    return [];
+  }
+}
+
+export async function getSubcollectionDocuments(
+  collectionName: string,
+  documentId: string,
+  subCollectionName: string
+): Promise<DocumentData[]> {
+  console.log("called");
+  try {
+    const docRef = await getDocs(
+      collection(db, collectionName, documentId, subCollectionName)
+    );
     const documents = docRef.docs.map((doc) => doc.data());
     return documents;
   } catch (e) {
