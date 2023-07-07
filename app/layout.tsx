@@ -3,6 +3,7 @@ import Footer from "./_common/footer";
 import HeaderResponsive from "./_common/header";
 import "./globals.css";
 import { Inter } from "next/font/google";
+import { AuthProvider } from "./firebase/service/authContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={inter.className}>
-        <HeaderResponsive />
+        <AuthProvider>
+          <HeaderResponsive />
           {children}
-        <Footer />
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

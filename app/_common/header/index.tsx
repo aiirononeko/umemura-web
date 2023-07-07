@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   createStyles,
   Header,
@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import { auth } from "@/app/firebase/config";
+import { AuthContext } from "@/app/firebase/service/authContext";
 
 const HEADER_HEIGHT = rem(60);
 
@@ -100,24 +100,24 @@ interface HeaderResponsiveProps {
   links: { link: string; label: string }[];
 }
 
-const currentUser = auth.currentUser;
-
-const initLinks: HeaderResponsiveProps = {
-  links: [{ link: "/", label: "ホーム" }].concat(
-    currentUser
+export default function HeaderResponsive() {
+  const user = useContext(AuthContext);
+  console.log(user);
+  console.log('hoge');
+  const [opened, { toggle, close }] = useDisclosure(false);
+  const { classes, cx } = useStyles();
+  const initLinks: HeaderResponsiveProps = {
+    links: [{ link: "/", label: "ホーム" }].concat(
+      user
       ? []
       : [
-          { link: "/signin", label: "ログイン" },
-          { link: "/signup", label: "新規登録" },
-        ]
-  ),
-};
-
-export default function HeaderResponsive() {
+        { link: "/signin", label: "ログイン" },
+        { link: "/signup", label: "新規登録" },
+      ]
+    ),
+  };
   const { links } = initLinks;
-  const [opened, { toggle, close }] = useDisclosure(false);
   const [active, setActive] = useState(links[0].link);
-  const { classes, cx } = useStyles();
 
   const items = links.map((link) => (
     <Link
