@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { registerAuthenticateStuff } from "./firebase/service/authentication";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -91,15 +91,10 @@ const SetPassword = (props: {
 
 export default function Top() {
   const currentUser = auth.currentUser;
-  const [email, setEmail] = useState<string | null>(useSearchParams().get("email"));
+  const email = useSearchParams().get("email");
   const [opened, { open, close }] = useDisclosure(email ? true : false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  useEffect(() => {
-    const queryString = window.location.search;
-    const parameter = new URLSearchParams(queryString);
-    setEmail(parameter.get("email") || "");
-  }, []);
   return (
     <>
       <Modal opened={opened} onClose={close}>
