@@ -42,8 +42,8 @@ export interface AvailableTime {
 export interface Reservation {
   customerId: string;
   stuffId: string;
-  courseId: string;
-  date: string;
+  course: string;
+  date: Timestamp;
   startTime: string;
   endTime: string;
 }
@@ -191,9 +191,11 @@ export async function updateDocument(
 
 function offLoadingAndBack(
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  router: AppRouterInstance,
-  backPath: string
+  router?: AppRouterInstance,
+  backPath?: string
 ) {
   setLoading(false);
-  router.push(backPath);
+  if (router && backPath) {
+    router.push(backPath);
+  }
 }

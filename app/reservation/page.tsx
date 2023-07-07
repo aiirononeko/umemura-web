@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Container,
   Stepper,
@@ -12,18 +12,27 @@ import {
   Text,
   Grid,
 } from "@mantine/core";
-import { DatePicker } from "@mantine/dates";
+import { DatePicker, TimeInput } from "@mantine/dates";
 import {
   AvailableTime,
   Course,
   Reservation,
   Stuff,
+  addDocument,
   getDocuments,
   getSubcollectionDocuments,
 } from "../firebase/service/collection";
-import { format } from "date-fns";
+import { format, addMinutes } from "date-fns";
+import { getUid } from "../firebase/service/authentication";
+import { Timestamp } from "firebase/firestore";
+import { Loading } from "../firebase/service/loading";
 
 export default function Reservation() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const uid = getUid();
+
   const [active, setActive] = useState(0);
   const nextStep = () =>
     setActive((current) => (current < 3 ? current + 1 : current));
@@ -37,12 +46,20 @@ export default function Reservation() {
   const [targetDateAvailableTimes, setTargetDateAvailableTimes] = useState<
     AvailableTime[]
   >([]);
+  const [targetDate, setTargetDate] = useState<Timestamp>();
 
   const [selectedStuff, setSelectedStuff] = useState<Stuff>();
   const [selectedCourse, setSelectedCourse] = useState<Course>();
   const [selectedAvailableTime, setSelectedAvailableTime] =
     useState<AvailableTime>();
-  const [reservation, setReservation] = useState<Reservation>();
+
+  const [startTime, setStartTime] = useState("");
+  const calcEndTime = (courseTime: string, startTime: string): Date => {
+    const today = new Date();
+    today.setHours(Number(startTime.split(":")[0]));
+    today.setMinutes(Number(startTime.split(":")[1]));
+    return addMinutes(today, Number(courseTime));
+  };
 
   useEffect(() => {
     getDocuments("stuffs").then((res) => {
@@ -138,15 +155,30 @@ export default function Reservation() {
                         fullWidth
                         mt="md"
                         radius="md"
-                        onClick={() => {
+                        onClick={async () => {
                           setSelectedCourse(course);
                           getSubcollectionDocuments(
                             "stuffs",
                             selectedStuff?.id ?? "",
                             "available_times"
                           ).then((res) => {
-                            setAvailableTimes(res as AvailableTime[]);
+                            const data = res as AvailableTime[];
+                            setAvailableTimes(data);
+
+                            const today = new Date();
+                            setTargetDateAvailableTimes(
+                              data.filter(
+                                (availableTime) =>
+                                  availableTime.date.toDate().getFullYear() ===
+                                    today.getFullYear() &&
+                                  availableTime.date.toDate().getMonth() ===
+                                    today.getMonth() &&
+                                  availableTime.date.toDate().getDay() ===
+                                    today.getDay()
+                              )
+                            );
                           });
+
                           nextStep();
                         }}
                       >
@@ -170,6 +202,7 @@ export default function Reservation() {
                 defaultDate={new Date()}
                 defaultValue={new Date()}
                 onChange={(date) => {
+                  setTargetDate(Timestamp.fromDate(date ?? new Date()));
                   setTargetDateAvailableTimes(
                     availableTimes.filter(
                       (availableTime) =>
@@ -193,6 +226,46 @@ export default function Reservation() {
                 key={`${availableTime.date}_${availableTime.startTime}_${availableTime.endTime}`}
               >
                 <Text fz="md">{`${availableTime.startTime} ~ ${availableTime.endTime}`}</Text>
+                <TimeInput
+                  label="開始時刻"
+                  size="md"
+                  onChange={(value) => {
+                    setStartTime(value.target.value);
+                  }}
+                  defaultValue={availableTime.startTime}
+                />
+                <Text fz="md">{`終了時間は${format(
+                  calcEndTime(
+                    selectedCourse?.time ?? "",
+                    startTime !== "" ? startTime : availableTime.startTime
+                  ),
+                  "HH:mm"
+                )}です`}</Text>
+
+                <Button
+                  variant="light"
+                  color="blue"
+                  fullWidth
+                  mt="md"
+                  radius="md"
+                  onClick={() => {
+                    availableTime.startTime =
+                      startTime !== "" ? startTime : availableTime.startTime;
+                    availableTime.endTime = format(
+                      calcEndTime(
+                        selectedCourse?.time ?? "",
+                        startTime !== "" ? startTime : availableTime.startTime
+                      ),
+                      "HH:mm"
+                    );
+                    availableTime.date =
+                      targetDate ?? Timestamp.fromDate(new Date());
+                    setSelectedAvailableTime(availableTime);
+                    nextStep();
+                  }}
+                >
+                  この日時を選択する
+                </Button>
               </div>
             ))}
           </Stepper.Step>
@@ -200,7 +273,41 @@ export default function Reservation() {
             label="Final step"
             description="予約内容を確認してください"
           >
-            予約確認画面
+            <p>{`指名スタッフ: ${selectedStuff?.lastName} ${selectedStuff?.firstName}`}</p>
+            <p>{`コース: ${selectedCourse?.title}`}</p>
+            <p>{`予約日時: ${format(
+              selectedAvailableTime?.date.toDate() ?? new Date(),
+              "yyyy/MM/dd"
+            )} ${selectedAvailableTime?.startTime} ~ ${
+              selectedAvailableTime?.endTime
+            }`}</p>
+            <p>{`お支払い金額: ${selectedCourse?.amount}円 (現地決済)`}</p>
+
+            <Button
+              variant="light"
+              color="blue"
+              fullWidth
+              mt="md"
+              radius="md"
+              onClick={() => {
+                addDocument(
+                  {
+                    customerId: uid ?? "",
+                    stuffId: selectedStuff?.id ?? "",
+                    course: selectedCourse?.title ?? "",
+                    date: selectedAvailableTime?.date ?? "",
+                    startTime: selectedAvailableTime?.startTime,
+                    endTime: selectedAvailableTime?.endTime,
+                  } as Reservation,
+                  "reservations",
+                  setLoading,
+                  router,
+                  "/"
+                );
+              }}
+            >
+              この内容で予約する
+            </Button>
           </Stepper.Step>
           <Stepper.Completed>
             予約が完了しました！ マイページから予約の確認ができます。
@@ -209,10 +316,10 @@ export default function Reservation() {
 
         <Group position="center" mt="xl">
           <Button variant="default" onClick={prevStep}>
-            一つ前に戻る
+            一つ前のステップに戻る
           </Button>
         </Group>
-        <Link href="/">トップページへ</Link>
+        {loading ? <Loading /> : <></>}
       </Container>
     </>
   );
