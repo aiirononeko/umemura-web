@@ -13,14 +13,14 @@ import { Container, Title, Center, Button, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Loading } from "../../firebase/service/loading";
 import { getUid } from "@/app/firebase/service/authentication";
-import { format } from "date-fns";
+import { Timestamp } from "firebase/firestore";
 
 export default function AvailableTimeRegister() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const form = useForm({
     initialValues: {
-      date: format(new Date(), "yyyy/MM/dd"),
+      date: Timestamp.fromDate(new Date()),
       startTime: "",
       endTime: "",
     } as AvailableTime,
