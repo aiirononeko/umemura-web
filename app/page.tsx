@@ -54,6 +54,7 @@ const SetPassword = (props: {setLoading: Dispatch<SetStateAction<boolean>>, onCl
           size="xs"
           label="パスワード"
           placeholder="パスワード"
+          type="password"
           required
           {...form.getInputProps("password")}
           mb="lg"
