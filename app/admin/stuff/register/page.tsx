@@ -28,6 +28,7 @@ export default function Top() {
       firstName: "",
       gender: "男性",
       email: "",
+      profile: "",
     },
     validate: {
       email: (value) =>
