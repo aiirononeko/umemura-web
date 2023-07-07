@@ -6,15 +6,15 @@ import { auth } from "../config";
 
 export const AuthContext = createContext<Partial<User> | null>({});
 
-/* export const useAuthContext = () => {
- *   return useContext(AuthContext);
- * } */
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<Partial<User> | null>(null);
   useEffect(() => {
     auth.onAuthStateChanged(user  => {
-      setUser(user);
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
     });
   }, []);
 

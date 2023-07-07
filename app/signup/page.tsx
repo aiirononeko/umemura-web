@@ -54,8 +54,7 @@ export default function SignUp() {
             values.password,
             setLoading,
             router,
-            "/",
-            true
+            "/"
           );
         })}
       >
