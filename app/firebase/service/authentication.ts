@@ -12,6 +12,7 @@ import {
   type Customer,
   type Stuff,
   addDocumentWithUid,
+  addDocument,
 } from "@/app/firebase/service/collection";
 
 function setCurrentUser() {
@@ -56,7 +57,7 @@ export function registerAuthenticate(
   setLoading: Dispatch<SetStateAction<boolean>>,
   router: AppRouterInstance,
   backPath: string,
-  haveToSetUser: boolean
+  haveToSetUser: boolean,
 ) {
   const { email } = collection;
   setLoading(true);
@@ -80,47 +81,55 @@ export function registerAuthenticate(
     });
 }
 
+export function registerAuthenticateStuff(
+  email: string,
+  password: string,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  router: AppRouterInstance,
+  backPath: string,
+  onClose: () => void,
+) {
+  setLoading(true);
+  console.log("called");
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((_userCredential) => {
+      window.alert("登録が完了しました。");
+      onClose();
+      router.push(backPath);
+    })
+    .catch((_error) => {
+      window.alert(`既にユーザーが存在します`);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}
+
 export function registerStuffWithSendingEmail(
   data: Stuff,
   setLoading: Dispatch<SetStateAction<boolean>>,
   router: AppRouterInstance,
   backPath: string,
-  haveToSetUser: boolean
 ) {
   const actionCodeSettings = {
-    // URL you want to redirect back to. The domain (www.example.com) for this
-    // URL must be in the authorized domains list in the Firebase Console.
-    url: 'http://localhost:3000?email=' + data.email,
-    // This must be true.
+    url: 'https://www.holisticbeautysalon.dev?email=' + data.email,
     handleCodeInApp: true,
-    // iOS: {
-    //   bundleId: 'com.example.ios'
-    // },
-    // android: {
-    //   packageName: 'com.example.android',
-    //   installApp: true,
-    //   minimumVersion: '12'
-    // },
-    // dynamicLinkDomain: 'example.page.link'
   };
   console.log(actionCodeSettings)
   setLoading(true);
   const { email } = data;
-  sendSignInLinkToEmail(auth, email, actionCodeSettings)
+  sendSignInLinkToEmail(auth, email!, actionCodeSettings)
     .then(() => {
-      // The link was successfully sent. Inform the user.
-      // Save the email locally so you don't need to ask the user for it again
-      // if they open the link on the same device.
-      console.log('success');
-      window.localStorage.setItem('emailForSignIn', email);
-      // ...
+      addDocument(data, 'stuffs');
+      window.alert('スタッフを登録し、メールを送信しました');
+      router.push(backPath);
     })
     .catch((error) => {
       console.log('error');
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorCode, errorMessage);
-      // ...
+      window.alert('メールを送信できませんでした(1日に送信できる上限を超えています)');
     })
     .finally(() => {
       setLoading(false);
