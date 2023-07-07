@@ -12,23 +12,20 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { registerAuthenticateStuff } from "./firebase/service/authentication";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loading } from "./firebase/service/loading";
-
-const queryString = window.location.search;
-const parameter = new URLSearchParams(queryString);
-const email = parameter.get("email");
 
 const SetPassword = (props: {
   setLoading: Dispatch<SetStateAction<boolean>>;
   onClose: () => void;
   router: AppRouterInstance;
   backPath: string;
+  email: string;
 }) => {
-  const { setLoading, router, backPath, onClose } = props;
+  const { setLoading, router, backPath, onClose, email } = props;
   const form = useForm({
     initialValues: {
       email: email || "",
@@ -94,10 +91,15 @@ const SetPassword = (props: {
 
 export default function Top() {
   const currentUser = auth.currentUser;
+  const [email, setEmail] = useState<string | null>(useSearchParams().get("email"));
   const [opened, { open, close }] = useDisclosure(email ? true : false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  console.log(currentUser);
+  useEffect(() => {
+    const queryString = window.location.search;
+    const parameter = new URLSearchParams(queryString);
+    setEmail(parameter.get("email") || "");
+  }, []);
   return (
     <>
       <Modal opened={opened} onClose={close}>
@@ -106,6 +108,7 @@ export default function Top() {
           onClose={close}
           router={router}
           backPath="/"
+          email={email || ""}
         />
       </Modal>
       <main className="flex min-h-screen flex-col items-center p-24">
