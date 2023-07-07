@@ -50,8 +50,7 @@ export default function Top() {
             values,
             setLoading,
             router,
-            "/admin/stuff",
-            false
+            "/admin/stuff"
           );
         })}
       >

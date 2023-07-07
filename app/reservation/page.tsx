@@ -12,6 +12,7 @@ import {
   Text,
   Grid,
 } from "@mantine/core";
+import { DatePicker } from "@mantine/dates";
 import {
   AvailableTime,
   Course,
@@ -20,6 +21,7 @@ import {
   getDocuments,
   getSubcollectionDocuments,
 } from "../firebase/service/collection";
+import { format } from "date-fns";
 
 export default function Reservation() {
   const [active, setActive] = useState(0);
@@ -31,6 +33,10 @@ export default function Reservation() {
   const [stuffs, setStuffs] = useState<Stuff[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
+
+  const [targetDateAvailableTimes, setTargetDateAvailableTimes] = useState<
+    AvailableTime[]
+  >([]);
 
   const [selectedStuff, setSelectedStuff] = useState<Stuff>();
   const [selectedCourse, setSelectedCourse] = useState<Course>();
@@ -85,7 +91,7 @@ export default function Reservation() {
                           setSelectedStuff(stuff);
                           getSubcollectionDocuments(
                             "stuffs",
-                            stuff.id,
+                            stuff.id ?? "",
                             "courses"
                           ).then((res) => {
                             setCourses(res as Course[]);
@@ -137,7 +143,7 @@ export default function Reservation() {
                           getSubcollectionDocuments(
                             "stuffs",
                             selectedStuff?.id ?? "",
-                            "availableTimes"
+                            "available_times"
                           ).then((res) => {
                             setAvailableTimes(res as AvailableTime[]);
                           });
@@ -156,7 +162,39 @@ export default function Reservation() {
             label="Third step"
             description="日にちを選択してください"
           >
-            日にち選択画面
+            <Group position="center" mb="lg">
+              <DatePicker
+                firstDayOfWeek={0}
+                locale="ja"
+                placeholder="日付を選択"
+                defaultDate={new Date()}
+                defaultValue={new Date()}
+                onChange={(date) => {
+                  setTargetDateAvailableTimes(
+                    availableTimes.filter(
+                      (availableTime) =>
+                        availableTime.date.toDate().getFullYear() ===
+                          date?.getFullYear() &&
+                        availableTime.date.toDate().getMonth() ===
+                          date?.getMonth() &&
+                        availableTime.date.toDate().getDay() === date?.getDay()
+                    )
+                  );
+                }}
+              />
+            </Group>
+            {targetDateAvailableTimes.length === 0 ? (
+              <Text fz="md">予約可能な時間がありません</Text>
+            ) : (
+              <Text fz="md">予約可能な時間</Text>
+            )}
+            {targetDateAvailableTimes.map((availableTime) => (
+              <div
+                key={`${availableTime.date}_${availableTime.startTime}_${availableTime.endTime}`}
+              >
+                <Text fz="md">{`${availableTime.startTime} ~ ${availableTime.endTime}`}</Text>
+              </div>
+            ))}
           </Stepper.Step>
           <Stepper.Step
             label="Final step"

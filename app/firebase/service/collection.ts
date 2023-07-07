@@ -7,6 +7,7 @@ import {
   addDoc,
   getDocs,
   DocumentData,
+  Timestamp,
 } from "firebase/firestore";
 
 export interface Customer {
@@ -33,7 +34,7 @@ export interface Stuff {
 }
 
 export interface AvailableTime {
-  date: string;
+  date: Timestamp;
   startTime: string;
   endTime: string;
 }
