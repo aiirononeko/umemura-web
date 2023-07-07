@@ -1,13 +1,20 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { auth } from "./firebase/config";
-import { Button, Center, Container, Modal, TextInput, Title } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Container,
+  Modal,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
 import { Dispatch, SetStateAction, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-import { registerAuthenticate, registerAuthenticateStuff } from "./firebase/service/authentication";
+import { registerAuthenticateStuff } from "./firebase/service/authentication";
 import { useRouter } from "next/navigation";
 import { Loading } from "./firebase/service/loading";
 
@@ -15,8 +22,13 @@ const queryString = window.location.search;
 const parameter = new URLSearchParams(queryString);
 const email = parameter.get("email");
 
-const SetPassword = (props: {setLoading: Dispatch<SetStateAction<boolean>>, onClose: () => void, router: AppRouterInstance, backPath: string}) => {
-  const {setLoading, router, backPath, onClose} = props;
+const SetPassword = (props: {
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  onClose: () => void;
+  router: AppRouterInstance;
+  backPath: string;
+}) => {
+  const { setLoading, router, backPath, onClose } = props;
   const form = useForm({
     initialValues: {
       email: email || "",
@@ -25,7 +37,8 @@ const SetPassword = (props: {setLoading: Dispatch<SetStateAction<boolean>>, onCl
     validate: {
       email: (value) =>
         /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)
-          ? null : "メールアドレスを正しく入力してください",
+          ? null
+          : "メールアドレスを正しく入力してください",
       password: (value) =>
         value.length < 6 ? "パスワードは6文字以上で入力してください" : null,
     },
@@ -38,7 +51,14 @@ const SetPassword = (props: {setLoading: Dispatch<SetStateAction<boolean>>, onCl
       </Center>
       <form
         onSubmit={form.onSubmit((values) => {
-          registerAuthenticateStuff(values.email, values.password, setLoading, router, backPath, onClose)
+          registerAuthenticateStuff(
+            values.email,
+            values.password,
+            setLoading,
+            router,
+            backPath,
+            onClose
+          );
         })}
       >
         <TextInput
@@ -70,7 +90,7 @@ const SetPassword = (props: {setLoading: Dispatch<SetStateAction<boolean>>, onCl
       </form>
     </Container>
   );
-}
+};
 
 export default function Top() {
   const currentUser = auth.currentUser;
