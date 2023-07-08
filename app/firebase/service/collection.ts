@@ -9,6 +9,7 @@ import {
   DocumentData,
   Timestamp,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 export interface Customer {
@@ -244,6 +245,39 @@ export async function updateSubCollectionDocument(
   } catch (e) {
     window.alert("保存に失敗しました");
     console.error(e);
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  }
+}
+
+export async function deleteSubCollectionDocument(
+  collectionName: string,
+  documentId: string,
+  subCollectionName: string,
+  subCollectionId: string,
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>,
+  router?: AppRouterInstance,
+  backPath?: string
+) {
+  console.log("called");
+  if (setLoading) {
+    setLoading(true);
+  }
+  try {
+    const docRef = doc(
+      db,
+      collectionName,
+      documentId,
+      subCollectionName,
+      subCollectionId
+    );
+    await deleteDoc(docRef);
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  } catch (e) {
+    window.alert("保存に失敗しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }

@@ -19,11 +19,12 @@ import {
   Reservation,
   Stuff,
   addDocument,
+  deleteSubCollectionDocument,
   getDocuments,
   getSubcollectionDocuments,
   updateSubCollectionDocument,
 } from "../firebase/service/collection";
-import { format, addMinutes } from "date-fns";
+import { format, addMinutes, isWithinInterval } from "date-fns";
 import { getUid } from "../firebase/service/authentication";
 import { Timestamp } from "firebase/firestore";
 import { Loading } from "../firebase/service/loading";
@@ -70,12 +71,58 @@ export default function Reservation() {
   ) => {
     availableTimes.forEach((availableTime) => {
       // reservationのstartTime ~ endTimeがavailableTimeのstartTime ~ endTimeの範囲外だったら終了
-      // TODO
+      const reservationStartTime = new Date();
+      reservationStartTime.setHours(
+        Number(reservation.startTime.split(":")[0])
+      );
+      reservationStartTime.setMinutes(
+        Number(reservation.startTime.split(":")[1])
+      );
 
-      // startTimeとendTimeが同じだったらavailableTimeを削除して終了
+      const reservationEndTime = new Date();
+      reservationEndTime.setHours(Number(reservation.endTime.split(":")[0]));
+      reservationEndTime.setMinutes(Number(reservation.endTime.split(":")[1]));
 
-      // reservationのstartTimeがavailableTimeと同じ場合
-      if (reservation.startTime === availableTime.startTime) {
+      const availableTimeStartTime = new Date();
+      availableTimeStartTime.setHours(
+        Number(availableTime.startTime.split(":")[0])
+      );
+      availableTimeStartTime.setMinutes(
+        Number(availableTime.startTime.split(":")[1])
+      );
+
+      const availableTimeEndTime = new Date();
+      availableTimeEndTime.setHours(
+        Number(availableTime.endTime.split(":")[0])
+      );
+      availableTimeEndTime.setMinutes(
+        Number(availableTime.endTime.split(":")[1])
+      );
+
+      if (
+        !isWithinInterval(reservationStartTime, {
+          start: availableTimeStartTime,
+          end: availableTimeEndTime,
+        }) ||
+        !isWithinInterval(reservationEndTime, {
+          start: availableTimeStartTime,
+          end: availableTimeEndTime,
+        })
+      ) {
+        // Nothing to do
+        // startTimeとendTimeが同じだったらavailableTimeを削除して終了
+      } else if (
+        reservation.startTime === availableTime.startTime &&
+        reservation.endTime === availableTime.endTime
+      ) {
+        deleteSubCollectionDocument(
+          "stuffs",
+          selectedStuffId,
+          "available_times",
+          availableTime.id
+        );
+        // reservationのstartTimeがavailableTimeと同じ場合
+      } else if (reservation.startTime === availableTime.startTime) {
         // availableTimeのstartTimeをreservationのendTimeに更新して終了
         updateSubCollectionDocument(
           {
