@@ -85,7 +85,7 @@ export function registerStuffWithSendingEmail(
 ) {
   const parameter = `email=${data.email}&lastName=${data.lastName}&firstName=${data.firstName}&gender=${data.gender}`;
   const actionCodeSettings = {
-    url: 'http://localhost:3000?' + parameter,
+    url: 'https://www.holisticbeautysalon.dev?' + parameter,
     handleCodeInApp: true,
   };
   console.log(actionCodeSettings)
