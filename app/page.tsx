@@ -132,7 +132,15 @@ export default function Top() {
         <Link href={currentUser ? "/reservation" : "signin"} className="pb-10">
           予約ページへ
         </Link>
-        <Link href={currentUser ? "/admin" : "signin"}>管理者ページへ</Link>
+        {
+          useContext(AuthContext).isStuff ? (
+            <Link href="/admin" className="pb-10">
+              スタッフページへ
+            </Link>
+          ) : (
+            <></>
+          )
+        }
       </main>
       {loading ? <Loading /> : <></>}
     </>

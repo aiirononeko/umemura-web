@@ -76,7 +76,7 @@ export default function Reservation() {
             description="スタッフを選択してください"
           >
             {stuffs.map((stuff) => (
-              <div key={`${stuff.firstName}_${stuff.lastName}`}>
+              <div key={`${stuff.lastName}_${stuff.firstName}`}>
                 <Grid className="mt-5">
                   <Grid.Col>
                     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -91,7 +91,7 @@ export default function Reservation() {
                       <Group position="apart" mt="md" mb="xs">
                         <Text
                           weight={500}
-                        >{`${stuff.firstName} ${stuff.lastName}`}</Text>
+                        >{`${stuff.lastName} ${stuff.firstName}`}</Text>
                       </Group>
 
                       <Text size="sm" color="dimmed">
