@@ -94,7 +94,7 @@ export default function Top() {
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
             >
-              登録
+              メール送信
             </Button>
             <Button
               component={Link}

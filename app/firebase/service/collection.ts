@@ -30,7 +30,7 @@ export interface Stuff {
   lastName?: string;
   gender?: string;
   profile?: string;
-  email?: string;
+  email: string;
 }
 
 export interface AvailableTime {

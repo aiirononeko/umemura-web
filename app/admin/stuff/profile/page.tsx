@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Loading } from "../../../firebase/service/loading";
-import { updateDocument } from "@/app/firebase/service/collection";
+import { Stuff, updateDocument } from "@/app/firebase/service/collection";
 import { getUid } from "@/app/firebase/service/authentication";
 
 export default function StuffProfile() {
@@ -21,7 +21,7 @@ export default function StuffProfile() {
   const form = useForm({
     initialValues: {
       profile: "",
-    },
+    } as Stuff,
   });
   const [loading, setLoading] = useState(false);
   const uid = getUid();

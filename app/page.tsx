@@ -13,22 +13,23 @@ import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
 import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-import { registerAuthenticateStuff } from "./firebase/service/authentication";
+import { registerAuthenticate } from "./firebase/service/authentication";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loading } from "./firebase/service/loading";
 import { AuthContext } from "./firebase/service/authContext";
+import { Stuff } from "./firebase/service/collection";
 
 const SetPassword = (props: {
   setLoading: Dispatch<SetStateAction<boolean>>;
   onClose: () => void;
   router: AppRouterInstance;
   backPath: string;
-  email: string;
+  stuff: Stuff;
 }) => {
-  const { setLoading, router, backPath, onClose, email } = props;
+  const { setLoading, router, backPath, onClose, stuff } = props;
   const form = useForm({
     initialValues: {
-      email: email || "",
+      email: stuff.email,
       password: "",
     },
     validate: {
@@ -48,8 +49,9 @@ const SetPassword = (props: {
       </Center>
       <form
         onSubmit={form.onSubmit((values) => {
-          registerAuthenticateStuff(
-            values.email,
+          registerAuthenticate(
+            stuff,
+            "stuffs",
             values.password,
             setLoading,
             router,
@@ -89,13 +91,31 @@ const SetPassword = (props: {
   );
 };
 
+function builderStuff(
+  lastName: string,
+  firstName: string,
+  gender: string,
+  email: string,
+) {
+  return {
+    lastName,
+    firstName,
+    gender,
+    email,
+    profile: "",
+  } as Stuff;
+}
+
 export default function Top() {
-  const currentUser = useContext(AuthContext).contextValue?.user;
-  const email = useSearchParams().get("email");
+  const currentUser = useContext(AuthContext).user;
+  const params = useSearchParams();
+  const lastName = params.get("lastName") || "";
+  const firstName = params.get("firstName") || "";
+  const gender = params.get("gender") || "";
+  const email = params.get("email") || "";
   const [opened, { open, close }] = useDisclosure(email ? true : false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  console.log(useContext(AuthContext).contextValue)
   return (
     <>
       <Modal opened={opened} onClose={close}>
@@ -104,7 +124,7 @@ export default function Top() {
           onClose={close}
           router={router}
           backPath="/"
-          email={email || ""}
+          stuff={builderStuff(lastName, firstName, gender, email)}
         />
       </Modal>
       <main className="flex min-h-screen flex-col items-center p-24">

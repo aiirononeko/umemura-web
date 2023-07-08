@@ -1,8 +1,9 @@
 "use client";
 
 import { User } from "firebase/auth";
-import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { auth } from "../config";
+import { getDocuments } from "./collection";
 
 interface ContextValue {
   user: User | null;
@@ -20,21 +21,23 @@ function builderContextValue(user: User | null, isStuff: boolean) {
   } as ContextValue;
 }
 
-export const AuthContext = createContext<Partial<{contextValue: ContextValue, setContextValue: Dispatch<SetStateAction<ContextValue>>}>>({});
+export const AuthContext = createContext<Partial<ContextValue>>({});
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [contextValue, setContextValue] = useState<ContextValue>(builderContextValue(null, false));
-  /* console.log(contextValue); */
   useEffect(() => {
     auth.onAuthStateChanged(user  => {
       if (user) {
-        setContextValue({ user, isStuff: contextValue.isStuff });
+        getDocuments("stuffs").then((stuffs) => {
+          const targetStuff = stuffs.find(s => s.id === user.uid)
+          setContextValue(builderContextValue(user, targetStuff ? true : false));
+        });
       }
     });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ contextValue, setContextValue }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   )

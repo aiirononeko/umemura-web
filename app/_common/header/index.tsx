@@ -101,13 +101,13 @@ interface HeaderResponsiveProps {
 }
 
 export default function HeaderResponsive() {
-  const user = useContext(AuthContext).contextValue?.user;
+  const user = useContext(AuthContext).user;
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
   const initLinks: HeaderResponsiveProps = {
     links: [{ link: "/", label: "ホーム" }].concat(
       user
-      ? []
+      ? [{ link: "/logout", label: "ログアウト" }]
       : [
         { link: "/signin", label: "ログイン" },
         { link: "/signup", label: "新規登録" },

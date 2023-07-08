@@ -12,7 +12,6 @@ import {
   type Customer,
   type Stuff,
   addDocumentWithUid,
-  addDocument,
 } from "@/app/firebase/service/collection";
 
 export function getUid() {
@@ -44,12 +43,13 @@ export function authenticate(
 }
 
 export function registerAuthenticate(
-  collection: Customer,
+  collection: Customer | Stuff,
   collectionName: string,
   password: string,
   setLoading: Dispatch<SetStateAction<boolean>>,
   router: AppRouterInstance,
   backPath: string,
+  onClose?: () => void
 ) {
   const { email } = collection;
   setLoading(true);
@@ -58,38 +58,21 @@ export function registerAuthenticate(
     .then((userCredential) => {
       const user = userCredential.user;
       const uid = user.uid;
-      addDocumentWithUid(collection, collectionName, uid);
-      window.alert("登録が完了しました。");
-      router.push(backPath);
+      console.log(collection);
+      const processedCollection = collectionName === 'stuffs' ? { ...collection, id: uid } : collection;
+      addDocumentWithUid(processedCollection, collectionName, uid).then(() => {
+        window.alert("登録が完了しました。");
+        setLoading(false);
+        router.push(backPath);
+      })
     })
     .catch((_error) => {
       window.alert(`既にユーザーが存在します`);
     })
     .finally(() => {
-      setLoading(false);
-    });
-}
-
-export function registerAuthenticateStuff(
-  email: string,
-  password: string,
-  setLoading: Dispatch<SetStateAction<boolean>>,
-  router: AppRouterInstance,
-  backPath: string,
-  onClose: () => void,
-) {
-  setLoading(true);
-  console.log("called");
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((_userCredential) => {
-      window.alert("登録が完了しました。");
-      onClose();
-      router.push(backPath);
-    })
-    .catch((_error) => {
-      window.alert(`既にユーザーが存在します`);
-    })
-    .finally(() => {
+      if (onClose) {
+        onClose();
+      }
       setLoading(false);
     });
 }
@@ -100,8 +83,9 @@ export function registerStuffWithSendingEmail(
   router: AppRouterInstance,
   backPath: string,
 ) {
+  const parameter = `email=${data.email}&lastName=${data.lastName}&firstName=${data.firstName}&gender=${data.gender}`;
   const actionCodeSettings = {
-    url: 'https://www.holisticbeautysalon.dev?email=' + data.email,
+    url: 'http://localhost:3000?' + parameter,
     handleCodeInApp: true,
   };
   console.log(actionCodeSettings)
@@ -109,8 +93,7 @@ export function registerStuffWithSendingEmail(
   const { email } = data;
   sendSignInLinkToEmail(auth, email!, actionCodeSettings)
     .then(() => {
-      addDocument(data, 'stuffs');
-      window.alert('スタッフを登録し、メールを送信しました');
+      window.alert('スタッフにメールを送信しました');
       router.push(backPath);
     })
     .catch((error) => {
