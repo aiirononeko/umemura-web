@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   createStyles,
   Header,
@@ -14,6 +14,8 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { AuthContext } from "@/app/firebase/service/authContext";
+import { signOut } from "firebase/auth";
+import { auth } from "@/app/firebase/config";
 
 const HEADER_HEIGHT = rem(60);
 
@@ -97,7 +99,21 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface HeaderResponsiveProps {
-  links: { link: string; label: string }[];
+  links: { link: string; label: string, onClick: () => void }[];
+}
+
+function logout() {
+  signOut(auth)
+    .then(() => {
+      // Sign-out successful.
+      console.log("logout");
+      window.alert("ログアウトしました")
+    })
+    .catch((error) => {
+      // An error happened.
+      console.log(error);
+      window.alert(error);
+    })
 }
 
 export default function HeaderResponsive() {
@@ -105,27 +121,28 @@ export default function HeaderResponsive() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
   const initLinks: HeaderResponsiveProps = {
-    links: [{ link: "/", label: "ホーム" }].concat(
+    links: [{ link: "/", label: "ホーム", onClick: () => {} }].concat(
       user
-      ? [{ link: "/logout", label: "ログアウト" }]
+      ? [{ link: "/", label: "ログアウト", onClick: logout}]
       : [
-        { link: "/signin", label: "ログイン" },
-        { link: "/signup", label: "新規登録" },
+        { link: "/signin", label: "ログイン", onClick: () => {} },
+        { link: "/signup", label: "新規登録", onClick: () => {} },
       ]
     ),
   };
   const { links } = initLinks;
-  const [active, setActive] = useState(links[0].link);
+  const [active, setActive] = useState(links[0].label);
 
   const items = links.map((link) => (
     <Link
       key={link.label}
       href={link.link}
       className={cx(classes.link, {
-        [classes.linkActive]: active === link.link,
+        [classes.linkActive]: active === link.label,
       })}
       onClick={(_event) => {
-        setActive(link.link);
+        link.onClick();
+        setActive(link.label);
         close();
       }}
     >

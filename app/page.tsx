@@ -18,6 +18,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loading } from "./firebase/service/loading";
 import { AuthContext } from "./firebase/service/authContext";
 import { Stuff } from "./firebase/service/collection";
+import { signOut } from "firebase/auth";
+import { auth } from "./firebase/config";
 
 const SetPassword = (props: {
   setLoading: Dispatch<SetStateAction<boolean>>;

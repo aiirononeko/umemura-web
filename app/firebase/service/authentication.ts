@@ -35,7 +35,7 @@ export function authenticate(
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      window.alert(`${errorCode}: ${errorMessage}`);
+      window.alert("メールアドレス、またはパスワードが違います");
     })
     .finally(() => {
       setLoading(false);
