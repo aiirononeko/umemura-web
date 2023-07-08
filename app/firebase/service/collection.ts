@@ -8,6 +8,7 @@ import {
   getDocs,
   DocumentData,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 
 export interface Customer {
@@ -34,6 +35,7 @@ export interface Stuff {
 }
 
 export interface AvailableTime {
+  id: string;
   date: Timestamp;
   startTime: string;
   endTime: string;
@@ -138,11 +140,28 @@ export async function addSubCollectionDocument(
     setLoading(true);
   }
   try {
-    await addDoc(
-      collection(db, collectionName, documentId, subCollectionName),
+    const docRef = collection(
+      db,
+      collectionName,
+      documentId,
+      subCollectionName
+    );
+    const result = await addDoc(docRef, {
+      ...data,
+    });
+    const subCollectionRef = doc(
+      db,
+      collectionName,
+      documentId,
+      subCollectionName,
+      result.id
+    );
+    await setDoc(
+      subCollectionRef,
       {
-        ...data,
-      }
+        id: result.id,
+      },
+      { merge: true }
     );
     window.alert("保存しました");
     if (setLoading) {
@@ -183,6 +202,48 @@ export async function updateDocument(
     }
   } catch (e) {
     window.alert("保存に失敗しました");
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  }
+}
+
+export async function updateSubCollectionDocument(
+  data: Collections,
+  collectionName: string,
+  documentId: string,
+  subCollectionName: string,
+  subDocumentId: string,
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>,
+  router?: AppRouterInstance,
+  backPath?: string
+) {
+  console.log("called");
+  if (setLoading) {
+    setLoading(true);
+  }
+  try {
+    const docRef = doc(
+      db,
+      collectionName,
+      documentId,
+      subCollectionName,
+      subDocumentId
+    );
+    await setDoc(
+      docRef,
+      {
+        ...data,
+      },
+      { merge: true }
+    );
+    window.alert("保存しました");
+    if (setLoading) {
+      offLoadingAndBack(setLoading, router!, backPath!);
+    }
+  } catch (e) {
+    window.alert("保存に失敗しました");
+    console.error(e);
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }

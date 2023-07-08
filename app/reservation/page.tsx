@@ -21,11 +21,13 @@ import {
   addDocument,
   getDocuments,
   getSubcollectionDocuments,
+  updateSubCollectionDocument,
 } from "../firebase/service/collection";
 import { format, addMinutes } from "date-fns";
 import { getUid } from "../firebase/service/authentication";
 import { Timestamp } from "firebase/firestore";
 import { Loading } from "../firebase/service/loading";
+import { addSubCollectionDocument } from "../firebase/service/collection";
 
 export default function Reservation() {
   const router = useRouter();
@@ -59,6 +61,73 @@ export default function Reservation() {
     today.setHours(Number(startTime.split(":")[0]));
     today.setMinutes(Number(startTime.split(":")[1]));
     return addMinutes(today, Number(courseTime));
+  };
+
+  const calcAvailableTime = async (
+    availableTimes: AvailableTime[],
+    reservation: Reservation,
+    selectedStuffId: string
+  ) => {
+    availableTimes.forEach((availableTime) => {
+      // reservationのstartTime ~ endTimeがavailableTimeのstartTime ~ endTimeの範囲外だったら終了
+      // TODO
+
+      // startTimeとendTimeが同じだったらavailableTimeを削除して終了
+
+      // reservationのstartTimeがavailableTimeと同じ場合
+      if (reservation.startTime === availableTime.startTime) {
+        // availableTimeのstartTimeをreservationのendTimeに更新して終了
+        updateSubCollectionDocument(
+          {
+            startTime: reservation.endTime,
+          } as AvailableTime,
+          "stuffs",
+          selectedStuffId,
+          "available_times",
+          availableTime.id
+        );
+        return;
+      } else if (reservation.endTime === availableTime.endTime) {
+        // reservationのendTimeがavailableTimeのEndTimeと同じ場合
+        // availableTimeのendTimeをreservationのstartTimeに更新して終了
+        console.log("in here");
+        updateSubCollectionDocument(
+          {
+            endTime: reservation.startTime,
+          } as AvailableTime,
+          "stuffs",
+          selectedStuffId,
+          "available_times",
+          availableTime.id
+        );
+        return;
+      } else {
+        // それ以外の場合
+        // availableTimeのendTimeをreservationのstartTimeに更新
+        updateSubCollectionDocument(
+          {
+            endTime: reservation.startTime,
+          } as AvailableTime,
+          "stuffs",
+          selectedStuffId,
+          "available_times",
+          availableTime.id
+        );
+        // 新しいavailableTimeを作成して、
+        // reservationのendTimeをavailableTimeのstartTimeに、大元のendTimeをavailableTimeのendTimeに更新して終了
+        addSubCollectionDocument(
+          {
+            date: availableTime.date,
+            startTime: reservation.endTime,
+            endTime: availableTime.endTime,
+          } as AvailableTime,
+          "stuffs",
+          selectedStuffId,
+          "available_times"
+        );
+        return;
+      }
+    });
   };
 
   useEffect(() => {
@@ -249,18 +318,19 @@ export default function Reservation() {
                   mt="md"
                   radius="md"
                   onClick={() => {
-                    availableTime.startTime =
-                      startTime !== "" ? startTime : availableTime.startTime;
-                    availableTime.endTime = format(
-                      calcEndTime(
-                        selectedCourse?.time ?? "",
-                        startTime !== "" ? startTime : availableTime.startTime
+                    const selected = {
+                      startTime:
+                        startTime !== "" ? startTime : availableTime.startTime,
+                      endTime: format(
+                        calcEndTime(
+                          selectedCourse?.time ?? "",
+                          startTime !== "" ? startTime : availableTime.startTime
+                        ),
+                        "HH:mm"
                       ),
-                      "HH:mm"
-                    );
-                    availableTime.date =
-                      targetDate ?? Timestamp.fromDate(new Date());
-                    setSelectedAvailableTime(availableTime);
+                      date: targetDate ?? Timestamp.fromDate(new Date()),
+                    } as AvailableTime;
+                    setSelectedAvailableTime(selected);
                     nextStep();
                   }}
                 >
@@ -303,6 +373,17 @@ export default function Reservation() {
                   setLoading,
                   router,
                   "/"
+                );
+
+                const reservation = {
+                  startTime: selectedAvailableTime?.startTime,
+                  endTime: selectedAvailableTime?.endTime,
+                } as Reservation;
+
+                calcAvailableTime(
+                  targetDateAvailableTimes,
+                  reservation,
+                  selectedStuff?.id ?? ""
                 );
               }}
             >
