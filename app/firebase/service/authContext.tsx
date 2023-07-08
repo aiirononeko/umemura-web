@@ -1,25 +1,40 @@
 "use client";
 
 import { User } from "firebase/auth";
-import { createContext, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
 import { auth } from "../config";
 
-export const AuthContext = createContext<Partial<User> | null>({});
+interface ContextValue {
+  user: User | null;
+  isStuff: boolean;
+}
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<Partial<User> | null>(null);
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+function builderContextValue(user: User | null, isStuff: boolean) {
+  return {
+    user,
+    isStuff,
+  } as ContextValue;
+}
+
+export const AuthContext = createContext<Partial<{contextValue: ContextValue, setContextValue: Dispatch<SetStateAction<ContextValue>>}>>({});
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [contextValue, setContextValue] = useState<ContextValue>(builderContextValue(null, false));
+  /* console.log(contextValue); */
   useEffect(() => {
     auth.onAuthStateChanged(user  => {
       if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
+        setContextValue({ user, isStuff: contextValue.isStuff });
       }
     });
   }, []);
 
   return (
-    <AuthContext.Provider value={user}>
+    <AuthContext.Provider value={{ contextValue, setContextValue }}>
       {children}
     </AuthContext.Provider>
   )

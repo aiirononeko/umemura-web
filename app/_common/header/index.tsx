@@ -101,9 +101,7 @@ interface HeaderResponsiveProps {
 }
 
 export default function HeaderResponsive() {
-  const user = useContext(AuthContext);
-  console.log(user);
-  console.log('hoge');
+  const user = useContext(AuthContext).contextValue?.user;
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
   const initLinks: HeaderResponsiveProps = {

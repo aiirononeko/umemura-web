@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { auth } from "./firebase/config";
 import {
   Button,
   Center,
@@ -12,11 +11,12 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { registerAuthenticateStuff } from "./firebase/service/authentication";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loading } from "./firebase/service/loading";
+import { AuthContext } from "./firebase/service/authContext";
 
 const SetPassword = (props: {
   setLoading: Dispatch<SetStateAction<boolean>>;
@@ -90,11 +90,12 @@ const SetPassword = (props: {
 };
 
 export default function Top() {
-  const currentUser = auth.currentUser;
+  const currentUser = useContext(AuthContext).contextValue?.user;
   const email = useSearchParams().get("email");
   const [opened, { open, close }] = useDisclosure(email ? true : false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  console.log(useContext(AuthContext).contextValue)
   return (
     <>
       <Modal opened={opened} onClose={close}>
