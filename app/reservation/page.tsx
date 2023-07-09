@@ -19,8 +19,6 @@ import {
   Course,
   Customer,
   Reservation,
-  Reservation,
-  Reservation,
   Stuff,
   addDocument,
   deleteSubCollectionDocument,
