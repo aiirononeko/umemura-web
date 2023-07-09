@@ -245,7 +245,7 @@ export default function Top() {
               電話番号: 0573-66-5930
             </Text>
             <Text align="left" mb={12}>
-              住所: 岐阜県中津川市淀川町3-20 昂21F
+              住所: 岐阜県中津川市淀川町3-20 昂2 1F
             </Text>
             <Text align="left" mb={12}>
               アクセス:
