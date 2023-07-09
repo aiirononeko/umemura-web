@@ -210,7 +210,7 @@ export default function Top() {
             </div>
           </div>
         </Center>
-        <Center>
+        <Center mt={20}>
           <Link href={currentUser ? "/reservation" : "signin"}>
             <Button variant="outline" color="teal" radius="xl" size="lg">
               オンラインで予約する

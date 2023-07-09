@@ -193,7 +193,13 @@ export default function Reservation() {
   return (
     <>
       <Container className="m-auto">
-        <Stepper active={active} onStepClick={setActive} breakpoint="sm">
+        <Stepper
+          active={active}
+          onStepClick={setActive}
+          breakpoint="sm"
+          mt={20}
+          mb={30}
+        >
           <Stepper.Step
             label="First step"
             description="スタッフを選択してください"
