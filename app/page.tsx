@@ -18,8 +18,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loading } from "./firebase/service/loading";
 import { AuthContext } from "./firebase/service/authContext";
 import { Stuff } from "./firebase/service/collection";
-import { signOut } from "firebase/auth";
-import { auth } from "./firebase/config";
 
 const SetPassword = (props: {
   setLoading: Dispatch<SetStateAction<boolean>>;
@@ -97,7 +95,7 @@ function builderStuff(
   lastName: string,
   firstName: string,
   gender: string,
-  email: string,
+  email: string
 ) {
   return {
     lastName,
@@ -134,15 +132,13 @@ export default function Top() {
         <Link href={currentUser ? "/reservation" : "signin"} className="pb-10">
           予約ページへ
         </Link>
-        {
-          useContext(AuthContext).isStuff ? (
-            <Link href="/admin" className="pb-10">
-              スタッフページへ
-            </Link>
-          ) : (
-            <></>
-          )
-        }
+        {useContext(AuthContext).isStuff ? (
+          <Link href="/admin" className="pb-10">
+            スタッフページへ
+          </Link>
+        ) : (
+          <></>
+        )}
       </main>
       {loading ? <Loading /> : <></>}
     </>

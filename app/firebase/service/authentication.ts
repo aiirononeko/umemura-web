@@ -58,13 +58,13 @@ export function registerAuthenticate(
     .then((userCredential) => {
       const user = userCredential.user;
       const uid = user.uid;
-      console.log(collection);
-      const processedCollection = collectionName === 'stuffs' ? { ...collection, id: uid } : collection;
+      const processedCollection =
+        collectionName === "stuffs" ? { ...collection, id: uid } : collection;
       addDocumentWithUid(processedCollection, collectionName, uid).then(() => {
         window.alert("登録が完了しました。");
         setLoading(false);
         router.push(backPath);
-      })
+      });
     })
     .catch((_error) => {
       window.alert(`既にユーザーが存在します`);
@@ -81,27 +81,29 @@ export function registerStuffWithSendingEmail(
   data: Stuff,
   setLoading: Dispatch<SetStateAction<boolean>>,
   router: AppRouterInstance,
-  backPath: string,
+  backPath: string
 ) {
   const parameter = `email=${data.email}&lastName=${data.lastName}&firstName=${data.firstName}&gender=${data.gender}`;
   const actionCodeSettings = {
-    url: 'https://www.holisticbeautysalon.dev?' + parameter,
+    url: "https://www.holisticbeautysalon.dev?" + parameter,
     handleCodeInApp: true,
   };
-  console.log(actionCodeSettings)
+  console.log(actionCodeSettings);
   setLoading(true);
   const { email } = data;
   sendSignInLinkToEmail(auth, email!, actionCodeSettings)
     .then(() => {
-      window.alert('スタッフにメールを送信しました');
+      window.alert("スタッフにメールを送信しました");
       router.push(backPath);
     })
     .catch((error) => {
-      console.log('error');
+      console.log("error");
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorCode, errorMessage);
-      window.alert('メールを送信できませんでした(1日に送信できる上限を超えています)');
+      window.alert(
+        "メールを送信できませんでした(1日に送信できる上限を超えています)"
+      );
     })
     .finally(() => {
       setLoading(false);

@@ -137,7 +137,6 @@ export default function Reservation() {
       } else if (reservation.endTime === availableTime.endTime) {
         // reservationのendTimeがavailableTimeのEndTimeと同じ場合
         // availableTimeのendTimeをreservationのstartTimeに更新して終了
-        console.log("in here");
         updateSubCollectionDocument(
           {
             endTime: reservation.startTime,
@@ -438,7 +437,9 @@ export default function Reservation() {
             </Button>
           </Stepper.Step>
           <Stepper.Completed>
-            予約が完了しました！ マイページから予約の確認ができます。
+            予約が完了しました！予約内容をメールで送信しましたのでご確認ください。
+            <br />
+            ご来店心よりお待ちしております。
           </Stepper.Completed>
         </Stepper>
 

@@ -25,16 +25,18 @@ function builderContextValue(user: User | null, isStuff: boolean) {
 export const AuthContext = createContext<Partial<ContextValue>>({});
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [contextValue, setContextValue] = useState<ContextValue>(builderContextValue(null, false));
+  const [contextValue, setContextValue] = useState<ContextValue>(
+    builderContextValue(null, false)
+  );
   const logoutParams = useSearchParams().get("logout");
-  console.log(logoutParams);
   useEffect(() => {
-    auth.onAuthStateChanged(user  => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log(user);
         getDocuments("stuffs").then((stuffs) => {
-          const targetStuff = stuffs.find(s => s.id === user.uid)
-          setContextValue(builderContextValue(user, targetStuff ? true : false));
+          const targetStuff = stuffs.find((s) => s.id === user.uid);
+          setContextValue(
+            builderContextValue(user, targetStuff ? true : false)
+          );
         });
       } else {
         setContextValue(builderContextValue(null, false));
@@ -43,8 +45,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  )
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 };
