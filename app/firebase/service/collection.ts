@@ -9,6 +9,8 @@ import {
   DocumentData,
   Timestamp,
   deleteDoc,
+  query,
+  getDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Dispatch, SetStateAction } from "react";
@@ -64,6 +66,20 @@ export async function getDocuments(
     const docRef = await getDocs(collection(db, collectionName));
     const documents = docRef.docs.map((doc) => doc.data());
     return documents;
+  } catch (e) {
+    console.error("Error adding document: ", e);
+    return [];
+  }
+}
+
+export async function getDocument(
+  collectionName: string,
+  documentId: string
+): Promise<DocumentData> {
+  try {
+    const docRef = doc(db, collectionName, documentId);
+    const document = getDoc(docRef);
+    return document;
   } catch (e) {
     console.error("Error adding document: ", e);
     return [];
@@ -178,27 +194,31 @@ export async function addSubCollectionDocument(
   }
 }
 
-export async function uploadImage(img: File, imgName: string,) {
+export async function uploadImage(img: File, imgName: string) {
   const storageRef = ref(storage, imgName);
-  uploadBytes(storageRef, img).then((snapshot) => {
-    console.log('success');
-    console.log(snapshot);
-  }).catch((error) => {
-    console.log('error');
-    console.log(error);
-  });
+  uploadBytes(storageRef, img)
+    .then((snapshot) => {
+      console.log("success");
+      console.log(snapshot);
+    })
+    .catch((error) => {
+      console.log("error");
+      console.log(error);
+    });
 }
 
 async function getImageUrl(imgName: string) {
   const folderPath = "gs://holisticbeautysalon-c978e.appspot.com/";
   const storageRef = ref(storage, folderPath + imgName);
-  const res = await getDownloadURL(storageRef).then((url) => {
-    return url;
-  }).catch((error) => {
-    console.log(error);
-    return '';
-  });
-  return res
+  const res = await getDownloadURL(storageRef)
+    .then((url) => {
+      return url;
+    })
+    .catch((error) => {
+      console.log(error);
+      return "";
+    });
+  return res;
 }
 
 export async function updateStuff(
@@ -208,7 +228,7 @@ export async function updateStuff(
   router: AppRouterInstance,
   backPath: string,
   img?: File,
-  imgName?: string,
+  imgName?: string
 ) {
   setLoading(true);
   if (img != undefined && imgName != undefined) {
@@ -225,11 +245,7 @@ export async function updateStuff(
       return {};
     }
   })();
-  await updateDocument(
-    stuff,
-    "stuffs",
-    uid,
-  );
+  await updateDocument(stuff, "stuffs", uid);
   setLoading(false);
   router.push(backPath);
 }

@@ -132,7 +132,7 @@ export default function Top() {
         />
       </Modal>
       <Container className="m-auto">
-        <Center p="md">
+        <Center mt={20}>
           <div
             style={{
               position: "relative",

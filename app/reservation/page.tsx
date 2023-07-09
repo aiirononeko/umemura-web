@@ -16,10 +16,12 @@ import { DatePicker, TimeInput } from "@mantine/dates";
 import {
   AvailableTime,
   Course,
+  Customer,
   Reservation,
   Stuff,
   addDocument,
   deleteSubCollectionDocument,
+  getDocument,
   getDocuments,
   getSubcollectionDocuments,
   updateSubCollectionDocument,
@@ -29,12 +31,14 @@ import { getUid } from "../firebase/service/authentication";
 import { Timestamp } from "firebase/firestore";
 import { Loading } from "../firebase/service/loading";
 import { addSubCollectionDocument } from "../firebase/service/collection";
+import sendMail from "./sendMail";
 
 export default function Reservation() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const uid = getUid();
+  const [customer, setCustomer] = useState<Customer>();
 
   const [active, setActive] = useState(0);
   const nextStep = () =>
@@ -180,7 +184,11 @@ export default function Reservation() {
     getDocuments("stuffs").then((res) => {
       setStuffs(res as Stuff[]);
     });
-  }, []);
+
+    getDocument("customers", uid ?? "").then((res) => {
+      setCustomer(res.data());
+    });
+  }, [uid]);
 
   return (
     <>
@@ -405,7 +413,7 @@ export default function Reservation() {
               fullWidth
               mt="md"
               radius="md"
-              onClick={() => {
+              onClick={async () => {
                 addDocument(
                   {
                     customerId: uid ?? "",
@@ -431,15 +439,28 @@ export default function Reservation() {
                   reservation,
                   selectedStuff?.id ?? ""
                 );
+
+                await sendMail(
+                  customer?.email ?? "",
+                  customer?.firstName ?? "",
+                  customer?.lastName ?? "",
+                  format(targetDate?.toDate() ?? new Date(), "yyyy/MM/dd"),
+                  reservation.startTime,
+                  reservation.endTime,
+                  selectedCourse?.title ?? "",
+                  selectedCourse?.amount ?? ""
+                );
               }}
             >
               この内容で予約する
             </Button>
           </Stepper.Step>
           <Stepper.Completed>
-            予約が完了しました！予約内容をメールで送信しましたのでご確認ください。
+            お客様のご予約が完了しました！ご予約内容をメールで送信しましたのでご確認ください。
             <br />
             ご来店心よりお待ちしております。
+            <br />
+            ※迷惑メールに届いている可能性もありますのでご注意ください。
           </Stepper.Completed>
         </Stepper>
 
