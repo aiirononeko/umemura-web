@@ -12,7 +12,6 @@ import {
   Text,
   Divider,
   TypographyStylesProvider,
-  Grid,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
@@ -141,7 +140,7 @@ export default function Top() {
             }}
           >
             <video
-              src="https://t.pimg.jp/mp4/098/530/329/1/98530329.mp4"
+              src="/top.mp4"
               autoPlay
               loop
               muted
