@@ -33,12 +33,12 @@ const SetPassword = (props: {
   const { setLoading, router, backPath, onClose, stuff } = props;
   const form = useForm({
     initialValues: {
-      email: stuff.email,
+      email: stuff.email!,
       password: "",
     },
     validate: {
       email: (value) =>
-        /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)
+        /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value!)
           ? null
           : "メールアドレスを正しく入力してください",
       password: (value) =>

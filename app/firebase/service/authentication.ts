@@ -54,7 +54,7 @@ export function registerAuthenticate(
   const { email } = collection;
   setLoading(true);
   console.log("called");
-  createUserWithEmailAndPassword(auth, email, password)
+  createUserWithEmailAndPassword(auth, email!, password)
     .then((userCredential) => {
       const user = userCredential.user;
       const uid = user.uid;

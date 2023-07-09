@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -10,21 +10,28 @@ import {
   Group,
   Title,
   Textarea,
+  FileInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Loading } from "../../../firebase/service/loading";
-import { Stuff, updateDocument } from "@/app/firebase/service/collection";
-import { getUid } from "@/app/firebase/service/authentication";
+import { AuthContext } from "@/app/firebase/service/authContext";
+import { updateStuff } from "@/app/firebase/service/collection";
+
+interface FormValue {
+  profile: string,
+  profileImage: File | undefined,
+}
 
 export default function StuffProfile() {
   const router = useRouter();
-  const form = useForm({
+  const form = useForm<FormValue>({
     initialValues: {
       profile: "",
-    } as Stuff,
+      profileImage: undefined,
+    },
   });
+  const uid = useContext(AuthContext).user?.uid;
   const [loading, setLoading] = useState(false);
-  const uid = getUid();
 
   return (
     <Container className="m-auto " size="xs">
@@ -33,21 +40,30 @@ export default function StuffProfile() {
       </Center>
       <form
         onSubmit={form.onSubmit((values) => {
-          updateDocument(
-            values,
-            "stuffs",
-            uid ?? "",
+          const imgName = values.profileImage ? uid + "." + values.profileImage.type.replace("image/", "") : undefined;
+          updateStuff(
+            values.profile,
             setLoading,
+            uid ?? "",
             router,
-            "/admin/stuff"
+            "/admin/stuff",
+            values.profileImage,
+            imgName,
           );
         })}
       >
+        <FileInput
+          label="プロフィール画像"
+          accept="image/*"
+          placeholder="プロフィール画像"
+          required
+          {...form.getInputProps("profileImage")}
+          mb="lg"
+        />
         <Textarea
           size="xs"
           label="プロフィール"
-          placeholder="プロフィール"
-          required
+          placeholder="更新しない場合は空欄にしてください"
           {...form.getInputProps("profile")}
           mb="lg"
         />

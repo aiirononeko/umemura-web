@@ -1,5 +1,5 @@
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-import { db } from "../config";
+import { db, storage } from "../config";
 import {
   doc,
   setDoc,
@@ -10,6 +10,8 @@ import {
   Timestamp,
   deleteDoc,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { Dispatch, SetStateAction } from "react";
 
 export interface Customer {
   firstName: string;
@@ -31,7 +33,8 @@ export interface Stuff {
   lastName?: string;
   gender?: string;
   profile?: string;
-  email: string;
+  profileImageUrl?: string;
+  email?: string;
 }
 
 export interface AvailableTime {
@@ -173,6 +176,62 @@ export async function addSubCollectionDocument(
       offLoadingAndBack(setLoading, router!, backPath!);
     }
   }
+}
+
+export async function uploadImage(img: File, imgName: string,) {
+  const storageRef = ref(storage, imgName);
+  uploadBytes(storageRef, img).then((snapshot) => {
+    console.log('success');
+    console.log(snapshot);
+  }).catch((error) => {
+    console.log('error');
+    console.log(error);
+  });
+}
+
+async function getImageUrl(imgName: string) {
+  const folderPath = "gs://holisticbeautysalon-c978e.appspot.com/";
+  const storageRef = ref(storage, folderPath + imgName);
+  const res = await getDownloadURL(storageRef).then((url) => {
+    return url;
+  }).catch((error) => {
+    console.log(error);
+    return '';
+  });
+  return res
+}
+
+export async function updateStuff(
+  profile: string,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  uid: string,
+  router: AppRouterInstance,
+  backPath: string,
+  img?: File,
+  imgName?: string,
+) {
+  setLoading(true);
+  if (img != undefined && imgName != undefined) {
+    await uploadImage(img, imgName);
+  }
+  const imgUrl = await getImageUrl(imgName!);
+  const stuff = (() => {
+    if (img) {
+      if (profile.length > 0) {
+        return { profile, profileImageUrl: imgUrl };
+      }
+      return { profileImageUrl: imgUrl };
+    } else {
+      return {};
+    }
+  })();
+  await updateDocument(
+    stuff,
+    "stuffs",
+    uid,
+  );
+  setLoading(false);
+  router.push(backPath);
 }
 
 export async function updateDocument(
