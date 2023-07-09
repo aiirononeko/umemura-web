@@ -8,6 +8,10 @@ import {
   Modal,
   TextInput,
   Title,
+  BackgroundImage,
+  Box,
+  Text,
+  Image,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
@@ -127,19 +131,90 @@ export default function Top() {
           stuff={builderStuff(lastName, firstName, gender, email)}
         />
       </Modal>
-      <main className="flex min-h-screen flex-col items-center p-24">
-        <h1 className="text-4xl font-bold pb-10">梅村のサイト</h1>
+      <Container className="m-auto">
+        <Center p="md">
+          <div
+            style={{
+              margin: "0 0 40px",
+              position: "relative",
+            }}
+          >
+            <video
+              src="https://t.pimg.jp/mp4/098/530/329/1/98530329.mp4"
+              autoPlay
+              loop
+              muted
+              style={{
+                width: "100%",
+                height: "460px",
+                maxHeight: "460px",
+                background: "#333",
+                borderRadius: "16px",
+                objectFit: "cover",
+              }}
+            ></video>
+            <div
+              style={{
+                position: "absolute",
+                display: "inline-block",
+                width: "100%",
+                height: "calc(100% - 8px)",
+                background: "rgba(0, 0, 0, 0.21)",
+                top: "0",
+                left: "0",
+                borderRadius: "16px",
+              }}
+            ></div>
+            <div
+              style={{
+                position: "absolute",
+                bottom: "calc(0px + 5px)", // 5pxはボタンのbox-shadowの分
+                padding: "24px",
+                width: "100%",
+                maxWidth: "100%",
+                maxHeight: "100%",
+              }}
+            >
+              <div
+                style={{
+                  margin: "0 0 24px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                }}
+              >
+                <h3
+                  style={{
+                    color: "#fff",
+                    fontSize: "18px",
+                    lineHeight: "1.5",
+                    flex: "0 0 auto",
+                  }}
+                >
+                  なりたいを叶えたら、
+                  <br />
+                  もっと好きになる。
+                </h3>
+                <h2
+                  style={{
+                    color: "#fff",
+                    fontSize: "24px",
+                    lineHeight: "1.5",
+                    flex: "0 0 auto",
+                  }}
+                >
+                  Holistic Beauty Salon
+                  <br />
+                  Lu Miijou
+                </h2>
+              </div>
+            </div>
+          </div>
+        </Center>
         <Link href={currentUser ? "/reservation" : "signin"} className="pb-10">
           予約ページへ
         </Link>
-        {useContext(AuthContext).isStuff ? (
-          <Link href="/admin" className="pb-10">
-            スタッフページへ
-          </Link>
-        ) : (
-          <></>
-        )}
-      </main>
+      </Container>
       {loading ? <Loading /> : <></>}
     </>
   );
