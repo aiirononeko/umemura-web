@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   createStyles,
   Header,
@@ -10,6 +10,8 @@ import {
   Paper,
   Transition,
   rem,
+  Center,
+  Image,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
@@ -17,7 +19,7 @@ import { AuthContext } from "@/app/firebase/service/authContext";
 import { signOut } from "firebase/auth";
 import { auth } from "@/app/firebase/config";
 
-const HEADER_HEIGHT = rem(60);
+const HEADER_HEIGHT = rem(80);
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -43,7 +45,7 @@ const useStyles = createStyles((theme) => ({
 
   header: {
     display: "flex",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     alignItems: "center",
     height: "100%",
   },
@@ -99,7 +101,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface HeaderResponsiveProps {
-  links: { link: string; label: string, onClick: () => void }[];
+  links: { link: string; label: string; onClick: () => void }[];
 }
 
 function logout() {
@@ -107,13 +109,13 @@ function logout() {
     .then(() => {
       // Sign-out successful.
       console.log("logout");
-      window.alert("ログアウトしました")
+      window.alert("ログアウトしました");
     })
     .catch((error) => {
       // An error happened.
       console.log(error);
       window.alert(error);
-    })
+    });
 }
 
 export default function HeaderResponsive() {
@@ -123,11 +125,11 @@ export default function HeaderResponsive() {
   const initLinks: HeaderResponsiveProps = {
     links: [{ link: "/", label: "ホーム", onClick: () => {} }].concat(
       user
-      ? [{ link: "/", label: "ログアウト", onClick: logout}]
-      : [
-        { link: "/signin", label: "ログイン", onClick: () => {} },
-        { link: "/signup", label: "新規登録", onClick: () => {} },
-      ]
+        ? [{ link: "/", label: "ログアウト", onClick: logout }]
+        : [
+            { link: "/signin", label: "ログイン", onClick: () => {} },
+            { link: "/signup", label: "新規登録", onClick: () => {} },
+          ]
     ),
   };
   const { links } = initLinks;
@@ -151,7 +153,7 @@ export default function HeaderResponsive() {
   ));
 
   return (
-    <Header height={HEADER_HEIGHT} mb={35} className={classes.root}>
+    <Header height={HEADER_HEIGHT} mb={30} className={classes.root}>
       <Container className={classes.header}>
         <Group spacing={5} className={classes.links}>
           {items}
@@ -163,6 +165,9 @@ export default function HeaderResponsive() {
           className={classes.burger}
           size="sm"
         />
+        <Center mx="auto">
+          <Image src="/HeaderLogo.svg" alt="logo" />
+        </Center>
 
         <Transition transition="pop-top-right" duration={200} mounted={opened}>
           {(styles) => (
