@@ -198,7 +198,7 @@ export default function Reservation() {
                       <Card.Section>
                         <Image
                           src={stuff.profileImageUrl}
-                          height={160}
+                          fit="cover"
                           alt="Norway"
                         />
                       </Card.Section>
