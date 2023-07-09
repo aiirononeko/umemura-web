@@ -135,8 +135,8 @@ export default function Top() {
         <Center p="md">
           <div
             style={{
-              margin: "0 0 40px",
               position: "relative",
+              marginBottom: "10px",
             }}
           >
             <video
@@ -158,7 +158,7 @@ export default function Top() {
                 position: "absolute",
                 display: "inline-block",
                 width: "100%",
-                height: "calc(100% - 8px)",
+                height: "calc(100%)",
                 background: "rgba(0, 0, 0, 0.21)",
                 top: "0",
                 left: "0",
@@ -168,7 +168,7 @@ export default function Top() {
             <div
               style={{
                 position: "absolute",
-                bottom: "calc(0px + 5px)", // 5pxはボタンのbox-shadowの分
+                bottom: "0px", // 5pxはボタンのbox-shadowの分
                 padding: "24px",
                 width: "100%",
                 maxWidth: "100%",
@@ -177,7 +177,6 @@ export default function Top() {
             >
               <div
                 style={{
-                  margin: "0 0 24px",
                   display: "flex",
                   flexWrap: "wrap",
                   gap: "12px",
@@ -211,9 +210,13 @@ export default function Top() {
             </div>
           </div>
         </Center>
-        <Link href={currentUser ? "/reservation" : "signin"} className="pb-10">
-          予約ページへ
-        </Link>
+        <Center>
+          <Link href={currentUser ? "/reservation" : "signin"}>
+            <Button variant="outline" color="teal" radius="xl" size="lg">
+              オンラインで予約する
+            </Button>
+          </Link>
+        </Center>
       </Container>
       {loading ? <Loading /> : <></>}
     </>
