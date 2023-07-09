@@ -31,6 +31,15 @@ export default function Admin() {
         <Grid.Col className="text-center">
           <Button
             component={Link}
+            href="/admin/reservation/offline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
+          >
+            オフラインの予約を管理する
+          </Button>
+        </Grid.Col>
+        <Grid.Col className="text-center">
+          <Button
+            component={Link}
             href="/admin/stuff/profile"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
           >
