@@ -73,7 +73,7 @@ export default function Reservation() {
     availableTimes: AvailableTime[],
     reservation: Reservation,
     selectedStuffId: string
-  ): Promise<boolean> => {
+  ): Promise<any> => {
     availableTimes.forEach((availableTime) => {
       // reservationのstartTime ~ endTimeがavailableTimeのstartTime ~ endTimeの範囲外だったら終了
       const reservationStartTime = new Date();
