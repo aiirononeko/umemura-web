@@ -19,6 +19,8 @@ import {
   Course,
   Customer,
   Reservation,
+  Reservation,
+  Reservation,
   Stuff,
   addDocument,
   deleteSubCollectionDocument,
@@ -73,7 +75,7 @@ export default function Reservation() {
     availableTimes: AvailableTime[],
     reservation: Reservation,
     selectedStuffId: string
-  ): Promise<any> => {
+  ): Promise<boolean> => {
     availableTimes.forEach((availableTime) => {
       // reservationのstartTime ~ endTimeがavailableTimeのstartTime ~ endTimeの範囲外だったら終了
       const reservationStartTime = new Date();
@@ -182,6 +184,73 @@ export default function Reservation() {
         return true;
       }
     });
+    return true;
+  };
+
+  const [reservations, setReservations] = useState<Reservation[]>();
+
+  const confirmReservations = async (
+    targetDate: Date,
+    availableStartTime: String,
+    availableEndTime: String
+  ): Promise<boolean> => {
+    // 同じ日にちの予約をフィルターする
+    const filteredReservations = reservations
+      ?.filter((reservation) => {
+        return (
+          reservation.date.toDate().getFullYear() ===
+            targetDate.getFullYear() &&
+          reservation.date.toDate().getMonth() === targetDate.getMonth() &&
+          reservation.date.toDate().getDay() === targetDate.getDay()
+        );
+      })
+      .filter((reservation) => {
+        const reservationStartTime = new Date();
+        reservationStartTime.setHours(
+          Number(reservation.startTime.split(":")[0])
+        );
+        reservationStartTime.setMinutes(
+          Number(reservation.startTime.split(":")[1])
+        );
+
+        const reservationEndTime = new Date();
+        reservationEndTime.setHours(Number(reservation.endTime.split(":")[0]));
+        reservationEndTime.setMinutes(
+          Number(reservation.endTime.split(":")[1])
+        );
+
+        const availableTimeStartTime = new Date();
+        availableTimeStartTime.setHours(
+          Number(availableStartTime.split(":")[0])
+        );
+        availableTimeStartTime.setMinutes(
+          Number(availableStartTime.split(":")[1])
+        );
+
+        const availableTimeEndTime = new Date();
+        availableTimeEndTime.setHours(Number(availableEndTime.split(":")[0]));
+        availableTimeEndTime.setMinutes(Number(availableEndTime.split(":")[1]));
+
+        // 予約しようとしている時間帯に登録されている予約を抽出
+        return (
+          isWithinInterval(availableTimeStartTime, {
+            start: reservationStartTime,
+            end: reservationEndTime,
+          }) ||
+          isWithinInterval(availableTimeEndTime, {
+            start: reservationStartTime,
+            end: reservationEndTime,
+          })
+        );
+      });
+
+    // 選択した時間の範囲内にある予約が2個以下なら予約可能、2個なら予約不可
+    if (filteredReservations?.length) {
+      console.log(filteredReservations?.length < 2);
+      return filteredReservations?.length < 2;
+    } else {
+      return true; // まだ予約がないのでtrue
+    }
   };
 
   useEffect(() => {
@@ -194,6 +263,10 @@ export default function Reservation() {
         setCustomer(res as Customer);
       });
     }
+
+    getDocuments("reservations").then((res) => {
+      setReservations(res as Reservation[]);
+    });
   }, [uid]);
 
   return (
@@ -426,46 +499,74 @@ export default function Reservation() {
               mt="md"
               radius="md"
               onClick={async () => {
-                addDocument(
-                  {
-                    customerId: uid ?? "",
-                    stuffId: selectedStuff?.id ?? "",
-                    course: selectedCourse?.title ?? "",
-                    date: selectedAvailableTime?.date ?? "",
-                    startTime: selectedAvailableTime?.startTime,
-                    endTime: selectedAvailableTime?.endTime,
-                  } as Reservation,
-                  "reservations"
-                );
+                setLoading(true);
 
-                const reservation = {
-                  startTime: selectedAvailableTime?.startTime,
-                  endTime: selectedAvailableTime?.endTime,
-                } as Reservation;
+                // 予約可能かどうかを確認
+                setTimeout(() => {
+                  confirmReservations(
+                    selectedAvailableTime?.date.toDate() ?? new Date(),
+                    selectedAvailableTime?.startTime ?? "",
+                    selectedAvailableTime?.endTime ?? ""
+                  ).then((canReserve) => {
+                    if (!canReserve) {
+                      setLoading(false);
+                      alert(
+                        "大変申し訳ございません。指定いただいた日時は予約がいっぱいですので、別の時間帯を指定ください。"
+                      );
+                      prevStep();
+                      return;
+                    }
 
-                const flag = await calcAvailableTime(
-                  targetDateAvailableTimes,
-                  reservation,
-                  selectedStuff?.id ?? ""
-                );
+                    const reservation = {
+                      startTime: selectedAvailableTime?.startTime,
+                      endTime: selectedAvailableTime?.endTime,
+                    } as Reservation;
 
-                if (!flag) return; // 予約可能時間外の場合
+                    const flag = calcAvailableTime(
+                      targetDateAvailableTimes,
+                      reservation,
+                      selectedStuff?.id ?? ""
+                    );
 
-                getDocument("customers", uid ?? "").then((res) => {
-                  const customer = res.data() as Customer;
-                  sendMail(
-                    customer?.email ?? "",
-                    customer?.firstName ?? "",
-                    customer?.lastName ?? "",
-                    format(targetDate?.toDate() ?? new Date(), "yyyy/MM/dd"),
-                    reservation.startTime,
-                    reservation.endTime,
-                    selectedCourse?.title ?? "",
-                    selectedCourse?.amount ?? ""
-                  );
-                });
+                    if (!flag) {
+                      setLoading(false);
+                      return;
+                    } // 予約可能時間外の場合
 
-                nextStep();
+                    addDocument(
+                      {
+                        customerId: uid ?? "",
+                        stuffId: selectedStuff?.id ?? "",
+                        course: selectedCourse?.title ?? "",
+                        date: selectedAvailableTime?.date ?? "",
+                        startTime: selectedAvailableTime?.startTime,
+                        endTime: selectedAvailableTime?.endTime,
+                      } as Reservation,
+                      "reservations"
+                    );
+
+                    getDocument("customers", uid ?? "").then((res) => {
+                      const customer = res.data() as Customer;
+                      sendMail(
+                        customer?.email ?? "",
+                        customer?.firstName ?? "",
+                        customer?.lastName ?? "",
+                        format(
+                          targetDate?.toDate() ?? new Date(),
+                          "yyyy/MM/dd"
+                        ),
+                        reservation.startTime,
+                        reservation.endTime,
+                        selectedCourse?.title ?? "",
+                        selectedCourse?.amount ?? ""
+                      );
+                    });
+
+                    setLoading(false);
+
+                    nextStep();
+                  });
+                }, 3000);
               }}
             >
               この内容で予約する
