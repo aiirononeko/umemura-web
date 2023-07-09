@@ -73,7 +73,7 @@ export default function Reservation() {
     availableTimes: AvailableTime[],
     reservation: Reservation,
     selectedStuffId: string
-  ) => {
+  ): Promise<boolean> => {
     availableTimes.forEach((availableTime) => {
       // reservationのstartTime ~ endTimeがavailableTimeのstartTime ~ endTimeの範囲外だったら終了
       const reservationStartTime = new Date();
@@ -114,7 +114,9 @@ export default function Reservation() {
           end: availableTimeEndTime,
         })
       ) {
-        // Nothing to do
+        alert("予約可能な時間ではありません。予約日時を選び直してください。");
+        prevStep();
+        return false;
         // startTimeとendTimeが同じだったらavailableTimeを削除して終了
       } else if (
         reservation.startTime === availableTime.startTime &&
@@ -126,6 +128,7 @@ export default function Reservation() {
           "available_times",
           availableTime.id
         );
+        return true;
         // reservationのstartTimeがavailableTimeと同じ場合
       } else if (reservation.startTime === availableTime.startTime) {
         // availableTimeのstartTimeをreservationのendTimeに更新して終了
@@ -138,7 +141,7 @@ export default function Reservation() {
           "available_times",
           availableTime.id
         );
-        return;
+        return true;
       } else if (reservation.endTime === availableTime.endTime) {
         // reservationのendTimeがavailableTimeのEndTimeと同じ場合
         // availableTimeのendTimeをreservationのstartTimeに更新して終了
@@ -151,7 +154,7 @@ export default function Reservation() {
           "available_times",
           availableTime.id
         );
-        return;
+        return true;
       } else {
         // それ以外の場合
         // availableTimeのendTimeをreservationのstartTimeに更新
@@ -176,7 +179,7 @@ export default function Reservation() {
           selectedStuffId,
           "available_times"
         );
-        return;
+        return true;
       }
     });
   };
@@ -440,11 +443,13 @@ export default function Reservation() {
                   endTime: selectedAvailableTime?.endTime,
                 } as Reservation;
 
-                calcAvailableTime(
+                const flag = await calcAvailableTime(
                   targetDateAvailableTimes,
                   reservation,
                   selectedStuff?.id ?? ""
                 );
+
+                if (!flag) return; // 予約可能時間外の場合
 
                 getDocument("customers", uid ?? "").then((res) => {
                   const customer = res.data() as Customer;
