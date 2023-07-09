@@ -32,7 +32,7 @@ export default function SignIn() {
 
   return (
     <>
-      <Container className="m-auto">
+      <Container>
         <form
           onSubmit={form.onSubmit((values) => {
             authenticate(
@@ -58,16 +58,14 @@ export default function SignIn() {
             type="password"
             {...form.getInputProps("password")}
           />
-          <div className="pt-4">
-            <Center>
-              <Button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
-              >
-                ログイン
-              </Button>
-            </Center>
-          </div>
+          <Center>
+            <Button
+              type="submit"
+              mt="lg"
+            >
+              ログイン
+            </Button>
+          </Center>
         </form>
         {loading ? <Loading /> : <></>}
       </Container>

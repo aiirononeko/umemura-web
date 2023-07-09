@@ -95,16 +95,14 @@ export default function SignUp() {
           type="password"
           {...form.getInputProps("password")}
         />
-        <div className="pt-4">
-          <Center>
-            <Button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
-            >
-              新規登録
-            </Button>
-          </Center>
-        </div>
+        <Center>
+          <Button
+            type="submit"
+            mt="lg"
+          >
+            新規登録
+          </Button>
+        </Center>
       </form>
       {loading ? <Loading /> : <></>}
     </Container>
