@@ -8,10 +8,11 @@ import {
   Modal,
   TextInput,
   Title,
-  BackgroundImage,
   Box,
   Text,
-  Image,
+  Divider,
+  TypographyStylesProvider,
+  Grid,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
@@ -211,6 +212,58 @@ export default function Top() {
           </div>
         </Center>
         <Center>
+          <Link href={currentUser ? "/reservation" : "signin"}>
+            <Button variant="outline" color="teal" radius="xl" size="lg">
+              オンラインで予約する
+            </Button>
+          </Link>
+        </Center>
+        <Center mb={20}>
+          <TypographyStylesProvider>
+            <h3>
+              歴16年累計施術10000人以上。全国のエステティシャンを指導する講師がいるサロンでなりたい自分を叶えよう
+            </h3>
+            <p>
+              肩こりや腰痛、頭痛など日々の体の不調は、背骨や骨盤の歪みが根本的な原因と言われています。《ル・ミージュ》では様々な年代毎の悩みに対応し、ただ美しくなるだけでなく骨格の歪みを整え、身体の内側と外側の両方をケアし、健康美をお造りします。もう歳だから…と諦めないで!!ぜひ一度お越しくださいませ。
+            </p>
+          </TypographyStylesProvider>
+        </Center>
+        <Center>
+          <Box
+            sx={(theme) => ({
+              textAlign: "center",
+              padding: theme.spacing.xl,
+              borderRadius: theme.radius.md,
+              border: "solid teal 0.5px",
+              width: "100%",
+            })}
+          >
+            <Text align="left" mb={12} size={18} weight="bolder">
+              サロン情報
+            </Text>
+            <Divider color="teal" mb={16} />
+            <Text align="left" mb={12}>
+              電話番号: 0573-66-5930
+            </Text>
+            <Text align="left" mb={12}>
+              住所: 岐阜県中津川市淀川町3-20 昂21F
+            </Text>
+            <Text align="left" mb={12}>
+              アクセス:
+              JR中津川駅を出て中津川駅前の信号を越えてしばらく直進。新町の信号を越えた所左側に当サロンがあります。ルビットタウン手前のマンション1F、食事処伊吹さんの奥です。ルビットタウンバス停側出口から徒歩30秒です。マンションの入り口ではなく、テナント側にお越しください。※施術中お電話出られないこともございます。折り返します。{" "}
+            </Text>
+            <Text align="left" mb={12}>
+              営業時間: 10:00 ~ 20:00 (最終受付19:00)
+              <br />
+              ※時間外は応相談
+            </Text>
+            <Text align="left" mb={12}>
+              定休日: 不定休
+            </Text>
+            <Text align="left">駐車場: あり</Text>
+          </Box>
+        </Center>
+        <Center mt={20} mb={30}>
           <Link href={currentUser ? "/reservation" : "signin"}>
             <Button variant="outline" color="teal" radius="xl" size="lg">
               オンラインで予約する
