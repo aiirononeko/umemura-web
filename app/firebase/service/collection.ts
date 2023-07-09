@@ -16,6 +16,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Dispatch, SetStateAction } from "react";
 
 export interface Customer {
+  id: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;

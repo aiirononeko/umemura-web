@@ -58,8 +58,7 @@ export function registerAuthenticate(
     .then((userCredential) => {
       const user = userCredential.user;
       const uid = user.uid;
-      const processedCollection =
-        collectionName === "stuffs" ? { ...collection, id: uid } : collection;
+      const processedCollection = { ...collection, id: uid };
       addDocumentWithUid(processedCollection, collectionName, uid).then(() => {
         window.alert("登録が完了しました。");
         setLoading(false);

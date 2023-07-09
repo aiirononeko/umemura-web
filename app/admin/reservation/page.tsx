@@ -1,59 +1,161 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { db } from "../../firebase/config";
-import { collection, getDocs } from "firebase/firestore";
+import { useState, useEffect, useContext } from "react";
+import { Reservation, getDocuments, Customer, Stuff } from "@/app/firebase/service/collection";
+import { AuthContext } from "@/app/firebase/service/authContext";
+import { Timestamp } from "firebase/firestore";
+import { Button, Center, Container, Modal, Table, Title } from "@mantine/core";
+import { DatePicker } from "@mantine/dates";
+import { useDisclosure } from "@mantine/hooks";
 
-export default function Top() {
-  const [reservations, setReservations] = useState([]);
-
-  const getReservations = async () => {
-    try {
-      const reservations: any = [];
-      const docRef = await getDocs(collection(db, "stuffs"));
-      docRef.forEach((doc) => {
-        reservations.push(doc.data());
-      });
-      setReservations(reservations);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
-
-  useEffect(() => {
-    getReservations();
-  }, []);
+const ReservationDetail = (props: { reservation: Reservation, customers: Customer[] }) => {
+  const { reservation, customers } = props;
+  const customer = customers.find(c => c.id === reservation.customerId);
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <h1 className="text-4xl font-bold pb-10">予約管理ページ</h1>
-      <Link href="/admin/reservation/register" className="pb-5">
-        予約可能日時を登録する
-      </Link>
-      <table className="table-auto">
+    <>
+      <Center>
+        <Title>
+          予約詳細
+        </Title>
+      </Center>
+      <h5>日時</h5>
+      <h1>{`${reservation.startTime}~${reservation.endTime}`}</h1>
+      <h5>コース名</h5>
+      <h1>{reservation.course}</h1>
+      <h5>お客様名</h5>
+      <h1>{`${customer?.lastName} ${customer?.firstName}`}</h1>
+      <h5>電話番号</h5>
+      <h1>{customer?.phoneNumber}</h1>
+    </>
+  )
+}
+
+export default function Top() {
+  const uid = useContext(AuthContext).user?.uid;
+  const [originReservations, setOriginReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [targetDate, setTargetDate] = useState(Timestamp.fromDate(new Date()));
+  const [opened, { open, close }] = useDisclosure(false);
+  const [num, setNum] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      if (uid != undefined) {
+        const reservationDocuments = await getDocuments("reservations") as Reservation[];
+        const filteredReservations = reservationDocuments.filter((r) => {
+          return r.stuffId === uid;
+        });
+        const targetCustomerIds = filteredReservations.map(doc => doc.customerId);
+        const customerDocuments = await getDocuments("customers") as Customer[]
+        const filteredCustomers = customerDocuments.filter(customer => targetCustomerIds.includes(customer.id));
+        setCustomers(filteredCustomers);
+        setOriginReservations(filteredReservations);
+        setReservations(filteredReservations.filter(r => {
+          const date = r.date.toDate();
+          const tDate = targetDate.toDate();
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1;
+          const day = date.getDate();
+          return year === tDate.getFullYear() && month === tDate.getMonth() + 1 && day === tDate.getDate();
+        }).sort((a, b) => {
+          if (a.startTime < b.startTime) {
+            return -1;
+          } else if (a.startTime > b.startTime) {
+            return 1;
+          } else {
+            return 0;
+        }}))
+      }})();
+  }, [uid]);
+
+  useEffect(() => {
+    const filteredDocuments = originReservations.filter(r => {
+      const date = r.date.toDate();
+      const tDate = targetDate.toDate();
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      return year === tDate.getFullYear() && month === tDate.getMonth() + 1 && day === tDate.getDate();
+    }).sort((a, b) => {
+      if (a.startTime < b.startTime) {
+        return -1;
+      } else if (a.startTime > b.startTime) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    setReservations(filteredDocuments);
+  }, [targetDate]);
+
+  return (
+    <Container>
+      <Modal opened={opened} onClose={close} size="xs">
+        <ReservationDetail reservation={reservations.at(num)!} customers={customers} />
+      </Modal>
+      <Center mb="lg">
+        <Title>
+          予約管理日時
+        </Title>
+      </Center>
+      <Center mb="lg">
+        <Button
+          component={Link}
+          href="/admin/availableTime"
+          className="mt-4"
+        >
+          予約可能日時を登録
+        </Button>
+      </Center>
+      <Center>
+        <DatePicker
+          value={targetDate.toDate()}
+          onChange={e => setTargetDate(Timestamp.fromDate(e!))}
+          placeholder="Select date"
+        />
+      </Center>
+      <Table
+        className="whitespace-nowrap"
+        verticalSpacing="xl"
+        striped
+        withBorder
+        withColumnBorders
+        mt="xl"
+      >
         <thead>
           <tr>
-            <th className="px-20 py-6">スタッフ名</th>
-            <th className="px-20 py-6">性別</th>
-            <th className="px-20 py-6">プロフィール</th>
+            <th>日時</th>
+            <th>コース名</th>
           </tr>
         </thead>
-        {reservations.map((reservation: any, index) => (
-          <tbody
-            key={`${reservation.firstName}_${reservation.lastName}_${index}`}
-          >
-            <tr>
-              <td className="border px-4 py-2">{`${reservation.lastName} ${reservation.firstName}`}</td>
-              <td className="border px-4 py-2">{reservation.gender}</td>
-              <td className="border px-4 py-2">{reservation.profile}</td>
-            </tr>
-          </tbody>
-        ))}
-      </table>
-      <Link href="/admin" className="pt-10">
-        管理者ページへ
-      </Link>
-    </main>
+        <tbody>
+          {reservations.map((reservation, index) => (
+            <>
+              <tr
+                key={index}
+                onClick={() => {
+                  setNum(index);
+                  open();
+                }}
+              >
+                <td>{`${reservation.startTime}~${reservation.endTime}`}</td>
+                <td>{reservation.course}</td>
+              </tr>
+            </>
+          ))}
+        </tbody>
+      </Table>
+      <Center mt="xl">
+        <Button
+          component={Link}
+          href="/admin"
+        >
+          戻る
+        </Button>
+      </Center>
+    </Container>
   );
 }

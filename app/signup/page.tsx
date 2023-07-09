@@ -15,6 +15,7 @@ function builderCustomer(values: {
   password: string;
 }): Customer {
   return {
+    id: "",
     firstName: values.firstName,
     lastName: values.lastName,
     phoneNumber: values.phoneNumber,
