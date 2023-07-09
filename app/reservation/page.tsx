@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Container,
   Stepper,
@@ -42,7 +43,7 @@ export default function Reservation() {
 
   const [active, setActive] = useState(0);
   const nextStep = () =>
-    setActive((current) => (current < 3 ? current + 1 : current));
+    setActive((current) => (current < 4 ? current + 1 : current));
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
@@ -185,9 +186,11 @@ export default function Reservation() {
       setStuffs(res as Stuff[]);
     });
 
-    getDocument("customers", uid ?? "").then((res) => {
-      setCustomer(res.data());
-    });
+    if (uid !== "") {
+      getDocument("customers", uid ?? "").then((res) => {
+        setCustomer(res as Customer);
+      });
+    }
   }, [uid]);
 
   return (
@@ -429,10 +432,7 @@ export default function Reservation() {
                     startTime: selectedAvailableTime?.startTime,
                     endTime: selectedAvailableTime?.endTime,
                   } as Reservation,
-                  "reservations",
-                  setLoading,
-                  router,
-                  "/"
+                  "reservations"
                 );
 
                 const reservation = {
@@ -446,16 +446,21 @@ export default function Reservation() {
                   selectedStuff?.id ?? ""
                 );
 
-                await sendMail(
-                  customer?.email ?? "",
-                  customer?.firstName ?? "",
-                  customer?.lastName ?? "",
-                  format(targetDate?.toDate() ?? new Date(), "yyyy/MM/dd"),
-                  reservation.startTime,
-                  reservation.endTime,
-                  selectedCourse?.title ?? "",
-                  selectedCourse?.amount ?? ""
-                );
+                getDocument("customers", uid ?? "").then((res) => {
+                  const customer = res.data() as Customer;
+                  sendMail(
+                    customer?.email ?? "",
+                    customer?.firstName ?? "",
+                    customer?.lastName ?? "",
+                    format(targetDate?.toDate() ?? new Date(), "yyyy/MM/dd"),
+                    reservation.startTime,
+                    reservation.endTime,
+                    selectedCourse?.title ?? "",
+                    selectedCourse?.amount ?? ""
+                  );
+                });
+
+                nextStep();
               }}
             >
               この内容で予約する
@@ -471,9 +476,15 @@ export default function Reservation() {
         </Stepper>
 
         <Group position="center" mt="xl">
-          <Button variant="default" onClick={prevStep}>
-            一つ前のステップに戻る
-          </Button>
+          {active === 4 ? (
+            <Button component={Link} href="/" variant="default">
+              トップページに戻る
+            </Button>
+          ) : (
+            <Button variant="default" onClick={prevStep}>
+              一つ前のステップに戻る
+            </Button>
+          )}
         </Group>
         {loading ? <Loading /> : <></>}
       </Container>

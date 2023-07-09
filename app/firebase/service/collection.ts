@@ -61,7 +61,6 @@ type Collections = Customer | Course | Stuff | AvailableTime | Reservation;
 export async function getDocuments(
   collectionName: string
 ): Promise<DocumentData[]> {
-  console.log("called");
   try {
     const docRef = await getDocs(collection(db, collectionName));
     const documents = docRef.docs.map((doc) => doc.data());
@@ -78,7 +77,7 @@ export async function getDocument(
 ): Promise<DocumentData> {
   try {
     const docRef = doc(db, collectionName, documentId);
-    const document = getDoc(docRef);
+    const document = await getDoc(docRef);
     return document;
   } catch (e) {
     console.error("Error adding document: ", e);
@@ -91,7 +90,6 @@ export async function getSubcollectionDocuments(
   documentId: string,
   subCollectionName: string
 ): Promise<DocumentData[]> {
-  console.log("called");
   try {
     const docRef = await getDocs(
       collection(db, collectionName, documentId, subCollectionName)
@@ -125,7 +123,6 @@ export async function addDocument(
   router?: AppRouterInstance,
   backPath?: string
 ) {
-  console.log("called");
   if (setLoading) {
     setLoading(true);
   }
@@ -133,12 +130,10 @@ export async function addDocument(
     await addDoc(collection(db, collectionName), {
       ...data,
     });
-    window.alert("保存しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
   } catch (e) {
-    window.alert("保存に失敗しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
@@ -182,12 +177,10 @@ export async function addSubCollectionDocument(
       },
       { merge: true }
     );
-    window.alert("保存しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
   } catch (e) {
-    window.alert("保存に失敗しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
@@ -271,12 +264,10 @@ export async function updateDocument(
       },
       { merge: true }
     );
-    window.alert("保存しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
   } catch (e) {
-    window.alert("保存に失敗しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
@@ -293,7 +284,6 @@ export async function updateSubCollectionDocument(
   router?: AppRouterInstance,
   backPath?: string
 ) {
-  console.log("called");
   if (setLoading) {
     setLoading(true);
   }
@@ -312,12 +302,10 @@ export async function updateSubCollectionDocument(
       },
       { merge: true }
     );
-    window.alert("保存しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
   } catch (e) {
-    window.alert("保存に失敗しました");
     console.error(e);
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
@@ -334,7 +322,6 @@ export async function deleteSubCollectionDocument(
   router?: AppRouterInstance,
   backPath?: string
 ) {
-  console.log("called");
   if (setLoading) {
     setLoading(true);
   }
@@ -351,7 +338,6 @@ export async function deleteSubCollectionDocument(
       offLoadingAndBack(setLoading, router!, backPath!);
     }
   } catch (e) {
-    window.alert("保存に失敗しました");
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }

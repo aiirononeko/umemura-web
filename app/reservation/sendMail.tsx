@@ -11,7 +11,7 @@ export default async function sendMail(
   reservationEndTime: string,
   course: string,
   amount: string
-) {
+): Promise<void> {
   const transporter = nodemailer.createTransport({
     port: 465,
     host: "smtp.gmail.com",
