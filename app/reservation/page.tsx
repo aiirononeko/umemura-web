@@ -291,6 +291,7 @@ export default function Reservation() {
                           src={stuff.profileImageUrl}
                           fit="cover"
                           alt="Norway"
+                          height={400}
                         />
                       </Card.Section>
 
