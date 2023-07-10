@@ -64,8 +64,9 @@ export default function Top() {
         />
         <TextInput
           label="背術時間"
-          placeholder="1時間"
+          placeholder="60"
           required
+          type="number"
           {...form.getInputProps("time")}
           mb="lg"
         />
@@ -80,6 +81,7 @@ export default function Top() {
           label="金額"
           placeholder="3000"
           required
+          type="number"
           {...form.getInputProps("amount")}
           mb="lg"
         />
