@@ -9,15 +9,20 @@ import {
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { Dispatch, SetStateAction } from "react";
 import {
-  type Customer,
   type Stuff,
   addDocumentWithUid,
 } from "@/app/firebase/service/collection";
 
+/**
+ * ユーザーのUIDを取得する.
+ */
 export function getUid() {
   return auth.currentUser?.uid;
 }
 
+/**
+ * ログイン処理.
+ */
 export function authenticate(
   email: string,
   password: string,
@@ -26,7 +31,6 @@ export function authenticate(
   backPath: string
 ) {
   setLoading(true);
-  console.log("called");
   signInWithEmailAndPassword(auth, email, password)
     .then((_userCredential) => {
       window.alert("ログインしました");
@@ -35,6 +39,7 @@ export function authenticate(
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
+      console.log(errorCode, errorMessage);
       window.alert("メールアドレス、またはパスワードが違います");
     })
     .finally(() => {
@@ -42,8 +47,11 @@ export function authenticate(
     });
 }
 
+/**
+ * ユーザー登録処理.
+ */
 export function registerAuthenticate(
-  collection: Customer | Stuff,
+  collection: Stuff,
   collectionName: string,
   password: string,
   setLoading: Dispatch<SetStateAction<boolean>>,
@@ -53,7 +61,6 @@ export function registerAuthenticate(
 ) {
   const { email } = collection;
   setLoading(true);
-  console.log("called");
   createUserWithEmailAndPassword(auth, email!, password)
     .then((userCredential) => {
       const user = userCredential.user;
@@ -87,7 +94,6 @@ export function registerStuffWithSendingEmail(
     url: "https://www.holisticbeautysalon.dev?" + parameter,
     handleCodeInApp: true,
   };
-  console.log(actionCodeSettings);
   setLoading(true);
   const { email } = data;
   sendSignInLinkToEmail(auth, email!, actionCodeSettings)

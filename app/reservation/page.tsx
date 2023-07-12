@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Container,
@@ -35,11 +34,9 @@ import { addSubCollectionDocument } from "../firebase/service/collection";
 import sendMail from "./sendMail";
 
 export default function Reservation() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const uid = getUid();
-  const [customer, setCustomer] = useState<Customer>();
 
   const [active, setActive] = useState(0);
   const nextStep = () =>
@@ -255,12 +252,6 @@ export default function Reservation() {
     getDocuments("stuffs").then((res) => {
       setStuffs(res as Stuff[]);
     });
-
-    if (uid !== "") {
-      getDocument("customers", uid ?? "").then((res) => {
-        setCustomer(res as Customer);
-      });
-    }
 
     getDocuments("reservations").then((res) => {
       setReservations(res as Reservation[]);

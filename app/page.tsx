@@ -211,7 +211,7 @@ export default function Top() {
           </div>
         </Center>
         <Center mt={20}>
-          <Link href={currentUser ? "/reservation" : "signin"}>
+          <Link href={"/reservation"}>
             <Button variant="outline" color="teal" radius="xl" size="lg">
               オンラインで予約する
             </Button>
