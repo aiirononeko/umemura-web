@@ -1,16 +1,17 @@
 "use client";
 
 import "dayjs/locale/ja";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   type AvailableTime,
   addDocument,
   Reservation,
+  getDocuments,
 } from "../../../firebase/service/collection";
 import { DatePicker, TimeInput } from "@mantine/dates";
-import { Container, Title, Center, Button, Group } from "@mantine/core";
+import { Container, Title, Center, Button, Group, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Loading } from "../../../firebase/service/loading";
 import { Timestamp } from "firebase/firestore";
@@ -25,6 +26,21 @@ export default function AvailableTimeRegister() {
       endTime: "",
     } as AvailableTime,
   });
+
+  const [offlineReservations, setOfflineReservations] = useState<Reservation[]>(
+    []
+  );
+
+  useEffect(() => {
+    const data = async () => {
+      const reservations = await getDocuments("reservations");
+      const offlineReservations = reservations.filter(
+        (reservation) => reservation.customerId === ""
+      );
+      setOfflineReservations(offlineReservations as Reservation[]);
+    };
+    data();
+  }, []);
 
   return (
     <Container className="m-auto " size="xs">
@@ -90,6 +106,21 @@ export default function AvailableTimeRegister() {
           </Center>
         </div>
       </form>
+      <Center>
+        <Text>登録したオフライン予約一覧</Text>
+      </Center>
+      <Center>
+        <ul>
+          {offlineReservations.map((reservation) => (
+            <li
+              key={`${reservation.date}_${reservation.startTime}_${reservation.endTime}`}
+            >
+              {reservation.date.toDate().toLocaleDateString()}{" "}
+              {reservation.startTime}~{reservation.endTime}
+            </li>
+          ))}
+        </ul>
+      </Center>
       {loading ? <Loading /> : <></>}
     </Container>
   );
