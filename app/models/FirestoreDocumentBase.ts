@@ -2,6 +2,11 @@ import {
   DocumentSnapshot,
   DocumentData,
   DocumentReference,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+  FirestoreDataConverter,
+  Timestamp,
+  FieldValue,
 } from "firebase/firestore";
 import { immerable, produce } from "immer";
 
@@ -63,11 +68,11 @@ export default class FirestoreDocumentBase<T extends FirestoreDocumentBase<T>> {
     });
   }
 
-  private get CommonConverter(): Firestore.FirestoreDataConverter<T> {
+  private get CommonConverter(): FirestoreDataConverter<T> {
     return {
       fromFirestore: (
-        snapshot: Firestore.QueryDocumentSnapshot,
-        options: Firestore.SnapshotOptions
+        snapshot: QueryDocumentSnapshot,
+        options: SnapshotOptions
       ): T => {
         const data = snapshot.data(options);
         const dateConverted = fromTimestampToDate(data);
@@ -78,14 +83,14 @@ export default class FirestoreDocumentBase<T extends FirestoreDocumentBase<T>> {
           ref: snapshot.ref,
         } as T;
       },
-      toFirestore: (values: Partial<T>): Firestore.DocumentData => {
+      toFirestore: (values: Partial<T>): DocumentData => {
         const data = omitUndefined(values);
 
         // update existing document
         if (data.id) {
           return {
             ...data,
-            createdAt: firestore.Timestamp.fromDate(new Date(data.createdAt)),
+            createdAt: Timestamp.fromDate(new Date(data.createdAt)),
             updatedAt: firestore.FieldValue.serverTimestamp(),
           };
         }
@@ -93,7 +98,7 @@ export default class FirestoreDocumentBase<T extends FirestoreDocumentBase<T>> {
         // create new document
         return {
           ...data,
-          createdAt: firestore.FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp(),
           updatedAt: firestore.FieldValue.serverTimestamp(),
         };
       },
