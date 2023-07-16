@@ -47,7 +47,9 @@ export interface AvailableTime {
 }
 
 export interface Reservation {
-  customerId: string;
+  customerName: string;
+  customerPhoneNumber: string;
+  customerEmail: string;
   stuffId: string;
   course: string;
   date: Timestamp;
