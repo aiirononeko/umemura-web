@@ -2,8 +2,18 @@
 
 import { Button, Center, Container, Grid, Title } from "@mantine/core";
 import Link from "next/link";
+import { useContext } from "react";
+import { AuthContext } from "../firebase/service/authContext";
+import { useRouter } from "next/navigation";
 
 export default function Admin() {
+  const router = useRouter();
+
+  const { user } = useContext(AuthContext);
+  if (!user) {
+    router.push("signin");
+  }
+
   return (
     <Container className="m-auto">
       <Center>
