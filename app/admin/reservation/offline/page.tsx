@@ -52,7 +52,6 @@ export default function AvailableTimeRegister() {
           setLoading(true);
           addDocument(
             {
-              customerId: "",
               stuffId: "",
               course: "",
               date: values.date,
