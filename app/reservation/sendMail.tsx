@@ -4,8 +4,7 @@ import nodemailer from "nodemailer";
 
 export default async function sendMail(
   email: string,
-  customerFirstName: string,
-  customerLastName: string,
+  customerName: string,
   reservationDate: string,
   reservationStartTime: string,
   reservationEndTime: string,
@@ -27,7 +26,7 @@ export default async function sendMail(
     to: email,
     subject: "以下の内容でご予約を受け付けました",
     text: `
-    ${customerLastName} ${customerFirstName}様
+    ${customerName}様
     ホリスティックサロン ルミージュです。
     この度はご予約いただき誠にありがとうございます。
     

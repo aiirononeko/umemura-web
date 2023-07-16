@@ -9,7 +9,6 @@ import {
   DocumentData,
   Timestamp,
   deleteDoc,
-  query,
   getDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -48,7 +47,9 @@ export interface AvailableTime {
 }
 
 export interface Reservation {
-  customerId: string;
+  customerName: string;
+  customerPhoneNumber: string;
+  customerEmail: string;
   stuffId: string;
   course: string;
   date: Timestamp;

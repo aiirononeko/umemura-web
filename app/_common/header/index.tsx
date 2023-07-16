@@ -119,24 +119,18 @@ function logout() {
 }
 
 export default function HeaderResponsive() {
-  const { user, isStuff } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
   const initLinks: HeaderResponsiveProps = {
-    links: [{ link: "/", label: "ホーム", onClick: () => {} }]
-      .concat(
-        user
-          ? [{ link: "/", label: "ログアウト", onClick: logout }]
-          : [
-              { link: "/signin", label: "ログイン", onClick: () => {} },
-              { link: "/signup", label: "新規登録", onClick: () => {} },
-            ]
-      )
-      .concat(
-        isStuff
-          ? [{ link: "/admin", label: "管理画面", onClick: () => {} }]
-          : []
-      ),
+    links: [{ link: "/", label: "ホーム", onClick: () => {} }].concat(
+      user
+        ? [
+            { link: "/admin", label: "管理画面", onClick: () => {} },
+            { link: "/", label: "ログアウト", onClick: logout },
+          ]
+        : []
+    ),
   };
   const { links } = initLinks;
   const [active, setActive] = useState(links[0].label);

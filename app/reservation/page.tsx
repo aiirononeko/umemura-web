@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Container,
@@ -12,41 +11,47 @@ import {
   Image,
   Text,
   Grid,
+  TextInput,
 } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import {
   AvailableTime,
   Course,
-  Customer,
   Reservation,
   Stuff,
   addDocument,
   deleteSubCollectionDocument,
-  getDocument,
   getDocuments,
   getSubcollectionDocuments,
   updateSubCollectionDocument,
 } from "../firebase/service/collection";
 import { format, addMinutes, isWithinInterval } from "date-fns";
-import { getUid } from "../firebase/service/authentication";
 import { Timestamp } from "firebase/firestore";
 import { Loading } from "../firebase/service/loading";
 import { addSubCollectionDocument } from "../firebase/service/collection";
 import sendMail from "./sendMail";
+import { useForm } from "@mantine/form";
 
 export default function Reservation() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const uid = getUid();
-  const [customer, setCustomer] = useState<Customer>();
+  const form = useForm({
+    initialValues: {
+      customerName: "",
+      customerPhoneNumber: "",
+      customerEmail: "",
+    },
+  });
 
   const [active, setActive] = useState(0);
   const nextStep = () =>
-    setActive((current) => (current < 4 ? current + 1 : current));
+    setActive((current) => (current < 5 ? current + 1 : current));
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhoneNumber, setCustomerPhoneNumber] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const [stuffs, setStuffs] = useState<Stuff[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
@@ -199,7 +204,7 @@ export default function Reservation() {
           reservation.date.toDate().getFullYear() ===
             targetDate.getFullYear() &&
           reservation.date.toDate().getMonth() === targetDate.getMonth() &&
-          reservation.date.toDate().getDay() === targetDate.getDay()
+          reservation.date.toDate().getDate() === targetDate.getDate()
         );
       })
       .filter((reservation) => {
@@ -256,16 +261,10 @@ export default function Reservation() {
       setStuffs(res as Stuff[]);
     });
 
-    if (uid !== "") {
-      getDocument("customers", uid ?? "").then((res) => {
-        setCustomer(res as Customer);
-      });
-    }
-
     getDocuments("reservations").then((res) => {
       setReservations(res as Reservation[]);
     });
-  }, [uid]);
+  }, []);
 
   return (
     <>
@@ -376,8 +375,8 @@ export default function Reservation() {
                                     today.getFullYear() &&
                                   availableTime.date.toDate().getMonth() ===
                                     today.getMonth() &&
-                                  availableTime.date.toDate().getDay() ===
-                                    today.getDay()
+                                  availableTime.date.toDate().getDate() ===
+                                    today.getDate()
                               )
                             );
                           });
@@ -413,7 +412,8 @@ export default function Reservation() {
                           date?.getFullYear() &&
                         availableTime.date.toDate().getMonth() ===
                           date?.getMonth() &&
-                        availableTime.date.toDate().getDay() === date?.getDay()
+                        availableTime.date.toDate().getDate() ===
+                          date?.getDate()
                     )
                   );
                 }}
@@ -474,6 +474,52 @@ export default function Reservation() {
             ))}
           </Stepper.Step>
           <Stepper.Step
+            label="Fourth step"
+            description="お客様情報を入力してください"
+          >
+            <form
+              onSubmit={form.onSubmit((values) => {
+                setCustomerName(values.customerName);
+                setCustomerEmail(values.customerEmail);
+                setCustomerPhoneNumber(values.customerPhoneNumber);
+                nextStep();
+              })}
+            >
+              <TextInput
+                label="お客様の氏名"
+                placeholder="整体 太郎"
+                required
+                {...form.getInputProps("customerName")}
+                mb="lg"
+              />
+              <TextInput
+                label="お客様の電話番号"
+                placeholder="08012345678"
+                required
+                {...form.getInputProps("customerPhoneNumber")}
+                mb="lg"
+              />
+              <TextInput
+                label="お客様のメールアドレス"
+                placeholder="holistic@example.com"
+                required
+                {...form.getInputProps("customerEmail")}
+                mb="lg"
+              />
+
+              <Button
+                type="submit"
+                variant="light"
+                color="blue"
+                fullWidth
+                mt="md"
+                radius="md"
+              >
+                この内容で進む
+              </Button>
+            </form>
+          </Stepper.Step>
+          <Stepper.Step
             label="Final step"
             description="予約内容を確認してください"
           >
@@ -530,7 +576,9 @@ export default function Reservation() {
 
                     addDocument(
                       {
-                        customerId: uid ?? "",
+                        customerName,
+                        customerPhoneNumber,
+                        customerEmail,
                         stuffId: selectedStuff?.id ?? "",
                         course: selectedCourse?.title ?? "",
                         date: selectedAvailableTime?.date ?? "",
@@ -540,26 +588,18 @@ export default function Reservation() {
                       "reservations"
                     );
 
-                    getDocument("customers", uid ?? "").then((res) => {
-                      const customer = res.data() as Customer;
-                      sendMail(
-                        customer?.email ?? "",
-                        customer?.firstName ?? "",
-                        customer?.lastName ?? "",
-                        format(
-                          targetDate?.toDate() ?? new Date(),
-                          "yyyy/MM/dd"
-                        ),
-                        reservation.startTime,
-                        reservation.endTime,
-                        selectedCourse?.title ?? "",
-                        selectedCourse?.amount ?? ""
-                      );
+                    sendMail(
+                      customerEmail ?? "",
+                      customerName ?? "",
+                      format(targetDate?.toDate() ?? new Date(), "yyyy/MM/dd"),
+                      reservation.startTime,
+                      reservation.endTime,
+                      selectedCourse?.title ?? "",
+                      selectedCourse?.amount ?? ""
+                    ).then((res) => {
+                      setLoading(false);
+                      nextStep();
                     });
-
-                    setLoading(false);
-
-                    nextStep();
                   });
                 }, 3000);
               }}
@@ -577,7 +617,7 @@ export default function Reservation() {
         </Stepper>
 
         <Group position="center" mt="xl">
-          {active === 4 ? (
+          {active === 5 ? (
             <Button component={Link} href="/" variant="default">
               トップページに戻る
             </Button>
