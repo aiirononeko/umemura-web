@@ -10,6 +10,8 @@ import {
   Timestamp,
   deleteDoc,
   getDoc,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Dispatch, SetStateAction } from "react";
@@ -64,7 +66,8 @@ export async function getDocuments(
   collectionName: string
 ): Promise<DocumentData[]> {
   try {
-    const docRef = await getDocs(collection(db, collectionName));
+    const q = query(collection(db, collectionName), orderBy("createdAt"));
+    const docRef = await getDocs(q);
     const documents = docRef.docs.map((doc) => doc.data());
     return documents;
   } catch (e) {
