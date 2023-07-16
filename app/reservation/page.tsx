@@ -204,7 +204,7 @@ export default function Reservation() {
           reservation.date.toDate().getFullYear() ===
             targetDate.getFullYear() &&
           reservation.date.toDate().getMonth() === targetDate.getMonth() &&
-          reservation.date.toDate().getDay() === targetDate.getDay()
+          reservation.date.toDate().getDate() === targetDate.getDate()
         );
       })
       .filter((reservation) => {
@@ -375,8 +375,8 @@ export default function Reservation() {
                                     today.getFullYear() &&
                                   availableTime.date.toDate().getMonth() ===
                                     today.getMonth() &&
-                                  availableTime.date.toDate().getDay() ===
-                                    today.getDay()
+                                  availableTime.date.toDate().getDate() ===
+                                    today.getDate()
                               )
                             );
                           });
@@ -412,7 +412,8 @@ export default function Reservation() {
                           date?.getFullYear() &&
                         availableTime.date.toDate().getMonth() ===
                           date?.getMonth() &&
-                        availableTime.date.toDate().getDay() === date?.getDay()
+                        availableTime.date.toDate().getDate() ===
+                          date?.getDate()
                     )
                   );
                 }}
