@@ -1,80 +1,122 @@
 "use client";
 
-import { Button, Center, Container, Grid, Title } from "@mantine/core";
 import Link from "next/link";
-import { useContext } from "react";
-import { AuthContext } from "../firebase/service/authContext";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useContext } from "react";
+import { Reservation } from "@/app/firebase/service/collection";
+import { AuthContext } from "@/app/firebase/service/authContext";
+import {
+  Timestamp,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { Button, Center, Container, Table, Title } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
+import { db } from "../firebase/config";
 
-export default function Admin() {
-  const router = useRouter();
+export default function Top() {
+  const uid = useContext(AuthContext).user?.uid;
 
-  const { user } = useContext(AuthContext);
-  if (!user) {
-    router.push("signin");
-  }
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [filteredReservations, setFilteredReservations] = useState<
+    Reservation[]
+  >([]);
+  const [targetDate, setTargetDate] = useState(Timestamp.fromDate(new Date()));
+
+  useEffect(() => {
+    if (uid) {
+      const fetchReservations = async () => {
+        try {
+          const q = query(
+            collection(db, "reservations"),
+            where("stuffId", "==", uid)
+          );
+          const docRef = await getDocs(q);
+          const documents = docRef.docs.map((doc) => doc.data());
+          setReservations(documents as Reservation[]);
+        } catch (e) {
+          console.error("Error adding document: ", e);
+          return [];
+        }
+      };
+      fetchReservations();
+    }
+  }, [uid]);
+
+  useEffect(() => {
+    const filteredDocuments = reservations
+      .filter((r) => {
+        const date = r.date.toDate();
+        const tDate = targetDate.toDate();
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        return (
+          year === tDate.getFullYear() &&
+          month === tDate.getMonth() + 1 &&
+          day === tDate.getDate()
+        );
+      })
+      .sort((a, b) => {
+        if (a.startTime < b.startTime) {
+          return -1;
+        } else if (a.startTime > b.startTime) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    setFilteredReservations(filteredDocuments);
+  }, [targetDate, reservations]);
 
   return (
-    <Container className="m-auto">
-      <Center>
-        <Title className="mb-12">管理者画面</Title>
+    <Container>
+      <Center mb="lg">
+        <Title>予約一覧</Title>
       </Center>
-      <Grid gutter="xl">
-        <Grid.Col className="text-center">
-          <Button
-            component={Link}
-            href="/admin/reservation"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
-          >
-            予約を管理する
-          </Button>
-        </Grid.Col>
-        <Grid.Col className="text-center">
-          <Button
-            component={Link}
-            href="/admin/availableTime"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
-          >
-            予約可能日時を管理する
-          </Button>
-        </Grid.Col>
-        <Grid.Col className="text-center">
-          <Button
-            component={Link}
-            href="/admin/reservation/offline"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
-          >
-            オフラインの予約を管理する
-          </Button>
-        </Grid.Col>
-        <Grid.Col className="text-center">
-          <Button
-            component={Link}
-            href="/admin/stuff/profile"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
-          >
-            プロフィールを管理する
-          </Button>
-        </Grid.Col>
-        <Grid.Col className="text-center">
-          <Button
-            component={Link}
-            href="/admin/course"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
-          >
-            コースを管理する
-          </Button>
-        </Grid.Col>
-        <Grid.Col className="text-center">
-          <Button
-            component={Link}
-            href="/admin/stuff"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-64"
-          >
-            スタッフを管理する
-          </Button>
-        </Grid.Col>
-      </Grid>
+      <Center>
+        <DateInput
+          valueFormat="YYYY/MM/DD"
+          value={targetDate.toDate()}
+          onChange={(e) => setTargetDate(Timestamp.fromDate(e!))}
+          placeholder="Select date"
+          styles={{
+            weekday: {
+              fontSize: 18,
+            },
+          }}
+        />
+      </Center>
+      <Table
+        className="whitespace-nowrap"
+        verticalSpacing="xl"
+        striped
+        withBorder
+        withColumnBorders
+        mt="xl"
+      >
+        <thead>
+          <tr>
+            <th>日時</th>
+            <th>コース名</th>
+            <th>お客様氏名</th>
+            <th>電話番号</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredReservations.map((reservation, index) => (
+            <>
+              <tr key={index}>
+                <td>{`${reservation.startTime}~${reservation.endTime}`}</td>
+                <td>{reservation.course}</td>
+                <td>{reservation.customerName}</td>
+                <td>{reservation.customerPhoneNumber}</td>
+              </tr>
+            </>
+          ))}
+        </tbody>
+      </Table>
     </Container>
   );
 }

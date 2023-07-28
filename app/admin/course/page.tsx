@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   type Course,
   getSubcollectionDocuments,
+  deleteSubCollectionDocument,
 } from "../../firebase/service/collection";
 import { Button, Center, Container, Table, Title } from "@mantine/core";
 import { getUid } from "@/app/firebase/service/authentication";
@@ -20,6 +21,16 @@ export default function Top() {
       }
     );
   }, []);
+
+  const updateCourse = async (course: Course) => {
+    console.log("update");
+  };
+
+  const deleteCourse = async (id: string) => {
+    const result = window.confirm("本当に削除しますか？");
+    if (result)
+      await deleteSubCollectionDocument("stuffs", uid ?? "", "courses", id);
+  };
 
   return (
     <>
@@ -46,9 +57,10 @@ export default function Top() {
           <thead>
             <tr>
               <th>コース名</th>
-              <th>背術時間</th>
+              <th>施術時間</th>
               <th>コース説明</th>
               <th>金額</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -60,6 +72,20 @@ export default function Top() {
                   {course.description}
                 </td>
                 <td>{course.amount}</td>
+                <td
+                  onClick={async (): Promise<void> =>
+                    await updateCourse(course)
+                  }
+                >
+                  編集
+                </td>
+                <td
+                  onClick={async (): Promise<void> =>
+                    await deleteCourse(course.id)
+                  }
+                >
+                  削除
+                </td>
               </tr>
             ))}
           </tbody>

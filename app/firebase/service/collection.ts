@@ -25,6 +25,7 @@ export interface Customer {
 }
 
 export interface Course {
+  id: string;
   title: string;
   time: string;
   description: string;
@@ -49,6 +50,7 @@ export interface AvailableTime {
 }
 
 export interface Reservation {
+  id: string;
   customerName: string;
   customerPhoneNumber: string;
   customerEmail: string;
