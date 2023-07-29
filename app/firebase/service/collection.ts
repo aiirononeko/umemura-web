@@ -134,8 +134,13 @@ export async function addDocument(
     setLoading(true);
   }
   try {
-    await addDoc(collection(db, collectionName), {
+    const collectionRef = collection(db, collectionName);
+    const result = await addDoc(collectionRef, {
       ...data,
+    });
+    const docRef = doc(db, collectionName, result.id);
+    await setDoc(docRef, {
+      id: result.id,
     });
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);

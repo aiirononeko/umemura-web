@@ -26,11 +26,12 @@ import {
   updateSubCollectionDocument,
 } from "../firebase/service/collection";
 import { format, addMinutes, isWithinInterval } from "date-fns";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, addDoc, collection, setDoc } from "firebase/firestore";
 import { Loading } from "../firebase/service/loading";
 import { addSubCollectionDocument } from "../firebase/service/collection";
 import sendMail from "./sendMail";
 import { useForm } from "@mantine/form";
+import { db } from "../firebase/config";
 
 export default function Reservation() {
   const [loading, setLoading] = useState(false);
@@ -596,10 +597,15 @@ export default function Reservation() {
                       reservation.endTime,
                       selectedCourse?.title ?? "",
                       selectedCourse?.amount ?? ""
-                    ).then((res) => {
-                      setLoading(false);
-                      nextStep();
-                    });
+                    )
+                      .then((res) => {
+                        setLoading(false);
+                        nextStep();
+                      })
+                      .catch((err) => {
+                        setLoading(false);
+                        alert("メールの送信に失敗しました。");
+                      });
                   });
                 }, 3000);
               }}

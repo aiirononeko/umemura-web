@@ -1,19 +1,31 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect, useContext } from "react";
 import { Reservation } from "@/app/firebase/service/collection";
 import { AuthContext } from "@/app/firebase/service/authContext";
 import {
   Timestamp,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
-import { Button, Center, Container, Table, Title } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import {
+  Button,
+  Center,
+  Group,
+  Modal,
+  Table,
+  TextInput,
+  Title,
+} from "@mantine/core";
+import { DateInput, TimeInput } from "@mantine/dates";
 import { db } from "../firebase/config";
+import { useDisclosure } from "@mantine/hooks";
+import { useForm } from "@mantine/form";
 
 export default function Top() {
   const uid = useContext(AuthContext).user?.uid;
@@ -23,6 +35,22 @@ export default function Top() {
     Reservation[]
   >([]);
   const [targetDate, setTargetDate] = useState(Timestamp.fromDate(new Date()));
+
+  const form = useForm({
+    initialValues: {
+      id: "",
+      customerName: "",
+      customerPhoneNumber: "",
+      customerEmail: "",
+      stuffId: "",
+      course: "",
+      date: targetDate,
+      startTime: "",
+      endTime: "",
+    } as Reservation,
+  });
+
+  const [opened, { open, close }] = useDisclosure();
 
   useEffect(() => {
     if (uid) {
@@ -85,6 +113,34 @@ export default function Top() {
     setFilteredReservations(filteredDocuments);
   }, [targetDate, reservations]);
 
+  const updateReservation = async (reservation: Reservation): Promise<void> => {
+    try {
+      if (uid) {
+        const docRef = doc(db, "reservations", reservation.id);
+        await setDoc(
+          docRef,
+          {
+            ...reservation,
+          },
+          { merge: true }
+        );
+      }
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  const deleteReservation = async (id: string): Promise<void> => {
+    try {
+      if (uid) {
+        const docRef = doc(db, "reservations", id);
+        deleteDoc(docRef);
+      }
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
   return (
     <>
       <Center mb="lg">
@@ -117,6 +173,7 @@ export default function Top() {
             <th>コース名</th>
             <th>お客様氏名</th>
             <th>電話番号</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -127,11 +184,94 @@ export default function Top() {
                 <td>{reservation.course}</td>
                 <td>{reservation.customerName}</td>
                 <td>{reservation.customerPhoneNumber}</td>
+                <td
+                  onClick={(): void => {
+                    form.setFieldValue("id", reservation.id);
+                    form.setValues(reservation);
+                    open();
+                  }}
+                >
+                  編集
+                </td>
+                <td
+                  onClick={(): void => {
+                    const result = window.confirm("削除しますか？");
+                    if (result) {
+                      deleteReservation(reservation.id);
+                    }
+                  }}
+                >
+                  削除
+                </td>{" "}
               </tr>
             </>
           ))}
         </tbody>
       </Table>
+      <Modal
+        opened={opened}
+        onClose={close}
+        centered
+        title="予約可能日時登録"
+        size="80%"
+      >
+        <form
+          onSubmit={form.onSubmit(async (value) => {
+            await updateReservation({
+              ...value,
+            });
+            form.reset();
+            close();
+          })}
+        >
+          <TimeInput
+            label="開始時刻"
+            size="md"
+            withAsterisk
+            {...form.getInputProps("startTime")}
+          />
+          <TimeInput
+            label="終了時刻"
+            size="md"
+            withAsterisk
+            {...form.getInputProps("endTime")}
+          />
+          <TextInput
+            label="コース名"
+            placeholder="ホニャホニャコース"
+            required
+            {...form.getInputProps("course")}
+            mb="lg"
+          />
+          <TextInput
+            label="お客様氏名"
+            placeholder="予約 太郎"
+            required
+            {...form.getInputProps("customerName")}
+            mb="lg"
+          />
+          <TextInput
+            label="電話番号"
+            placeholder="080-0808-0808"
+            required
+            {...form.getInputProps("customerPhoneNumber")}
+            mb="lg"
+          />
+          <div className="pt-4">
+            <Center>
+              <Group mt={20}>
+                <Button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
+                  color="green"
+                >
+                  登録
+                </Button>
+              </Group>
+            </Center>
+          </div>
+        </form>
+      </Modal>
     </>
   );
 }

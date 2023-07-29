@@ -182,7 +182,9 @@ export default function HeaderResponsive() {
           </>
         )}
         <Center mx="auto">
-          <Image src="/HeaderLogo.svg" alt="logo" />
+          <Link href="/">
+            <Image src="/HeaderLogo.svg" alt="logo" />
+          </Link>
         </Center>
 
         <Transition transition="pop-top-right" duration={200} mounted={opened}>
