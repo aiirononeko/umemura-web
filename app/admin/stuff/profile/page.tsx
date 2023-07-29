@@ -1,11 +1,9 @@
 "use client";
 
-import { useContext, useState } from "react";
-import Link from "next/link";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Button,
-  Container,
   Center,
   Group,
   Title,
@@ -15,32 +13,55 @@ import {
 import { useForm } from "@mantine/form";
 import { Loading } from "../../../firebase/service/loading";
 import { AuthContext } from "@/app/firebase/service/authContext";
-import { updateStuff } from "@/app/firebase/service/collection";
+import { Stuff, updateStuff } from "@/app/firebase/service/collection";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/app/firebase/config";
 
 interface FormValue {
-  profile: string,
-  profileImage: File | undefined,
+  profile: string;
+  profileImage: File | undefined;
 }
 
 export default function StuffProfile() {
   const router = useRouter();
+  const uid = useContext(AuthContext).user?.uid;
+
+  const [stuff, setStuff] = useState<Stuff | null>(null);
+
+  useEffect(() => {
+    if (uid) {
+      const fetchStuff = async () => {
+        try {
+          const docRef = await getDoc(doc(db, "stuffs", uid));
+          const document = docRef.data();
+          setStuff(document as Stuff);
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
+      };
+      fetchStuff();
+      console.log(stuff);
+    }
+  }, [uid]);
+
   const form = useForm<FormValue>({
     initialValues: {
-      profile: "",
+      profile: stuff?.profile ?? "",
       profileImage: undefined,
     },
   });
-  const uid = useContext(AuthContext).user?.uid;
   const [loading, setLoading] = useState(false);
 
   return (
-    <Container className="m-auto " size="xs">
+    <>
       <Center>
-        <Title className="mb-12">プロフィール設定</Title>
+        <Title mb={30}>プロフィール設定</Title>
       </Center>
       <form
         onSubmit={form.onSubmit((values) => {
-          const imgName = values.profileImage ? uid + "." + values.profileImage.type.replace("image/", "") : undefined;
+          const imgName = values.profileImage
+            ? uid + "." + values.profileImage.type.replace("image/", "")
+            : undefined;
           updateStuff(
             values.profile,
             setLoading,
@@ -48,7 +69,7 @@ export default function StuffProfile() {
             router,
             "/admin/stuff",
             values.profileImage,
-            imgName,
+            imgName
           );
         })}
       >
@@ -63,7 +84,7 @@ export default function StuffProfile() {
         <Textarea
           size="xs"
           label="プロフィール"
-          placeholder="更新しない場合は空欄にしてください"
+          placeholder="よろしくお願いします！"
           {...form.getInputProps("profile")}
           mb="lg"
         />
@@ -75,17 +96,10 @@ export default function StuffProfile() {
             >
               登録
             </Button>
-            <Button
-              component={Link}
-              href="/admin/stuff"
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold"
-            >
-              戻る
-            </Button>
           </Group>
         </Center>
       </form>
       {loading ? <Loading /> : <></>}
-    </Container>
+    </>
   );
 }
