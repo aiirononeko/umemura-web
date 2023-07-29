@@ -28,9 +28,24 @@ export default function Top() {
     if (uid) {
       const fetchReservations = async () => {
         try {
+          const _day = new Date();
           const q = query(
             collection(db, "reservations"),
-            where("stuffId", "==", uid)
+            where("stuffId", "==", uid),
+            where(
+              "date",
+              ">=",
+              Timestamp.fromDate(
+                new Date(
+                  _day.getFullYear(),
+                  _day.getMonth(),
+                  _day.getDate(),
+                  0,
+                  0,
+                  0
+                )
+              )
+            )
           );
           const docRef = await getDocs(q);
           const documents = docRef.docs.map((doc) => doc.data());
