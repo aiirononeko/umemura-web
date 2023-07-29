@@ -604,7 +604,8 @@ export default function Reservation() {
                       })
                       .catch((err) => {
                         setLoading(false);
-                        alert("メールの送信に失敗しました。");
+                        // TODO: メールの送信に失敗した場合の処理
+                        nextStep();
                       });
                   });
                 }, 3000);
