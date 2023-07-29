@@ -71,7 +71,7 @@ export default function Top() {
   }, [targetDate, reservations]);
 
   return (
-    <Container>
+    <>
       <Center mb="lg">
         <Title>予約一覧</Title>
       </Center>
@@ -117,6 +117,6 @@ export default function Top() {
           ))}
         </tbody>
       </Table>
-    </Container>
+    </>
   );
 }
