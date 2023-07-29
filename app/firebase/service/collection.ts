@@ -25,6 +25,7 @@ export interface Customer {
 }
 
 export interface Course {
+  id: string;
   title: string;
   time: string;
   description: string;
@@ -49,6 +50,7 @@ export interface AvailableTime {
 }
 
 export interface Reservation {
+  id: string;
   customerName: string;
   customerPhoneNumber: string;
   customerEmail: string;
@@ -132,8 +134,13 @@ export async function addDocument(
     setLoading(true);
   }
   try {
-    await addDoc(collection(db, collectionName), {
+    const collectionRef = collection(db, collectionName);
+    const result = await addDoc(collectionRef, {
       ...data,
+    });
+    const docRef = doc(db, collectionName, result.id);
+    await setDoc(docRef, {
+      id: result.id,
     });
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);

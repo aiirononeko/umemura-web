@@ -123,14 +123,26 @@ export default function HeaderResponsive() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
   const initLinks: HeaderResponsiveProps = {
-    links: [{ link: "/", label: "ホーム", onClick: () => {} }].concat(
-      user
-        ? [
-            { link: "/admin", label: "管理画面", onClick: () => {} },
-            { link: "/", label: "ログアウト", onClick: logout },
-          ]
-        : []
-    ),
+    links: [
+      { link: "/admin", label: "予約", onClick: () => {} },
+      {
+        link: "/admin/availableTime",
+        label: "予約可能日時",
+        onClick: () => {},
+      },
+      {
+        link: "/admin/reservation/offline",
+        label: "オフライン予約",
+        onClick: () => {},
+      },
+      {
+        link: "/admin/stuff/profile",
+        label: "プロフィール",
+        onClick: () => {},
+      },
+      { link: "/admin/course", label: "コース", onClick: () => {} },
+      { link: "/admin/stuff", label: "スタッフ", onClick: () => {} },
+    ],
   };
   const { links } = initLinks;
   const [active, setActive] = useState(links[0].label);
@@ -155,18 +167,24 @@ export default function HeaderResponsive() {
   return (
     <Header height={HEADER_HEIGHT} mb={10} className={classes.root}>
       <Container className={classes.header}>
-        <Group spacing={5} className={classes.links}>
-          {items}
-        </Group>
+        {user && (
+          <>
+            <Group spacing={5} className={classes.links}>
+              {items}
+            </Group>
 
-        <Burger
-          opened={opened}
-          onClick={toggle}
-          className={classes.burger}
-          size="sm"
-        />
+            <Burger
+              opened={opened}
+              onClick={toggle}
+              className={classes.burger}
+              size="sm"
+            />
+          </>
+        )}
         <Center mx="auto">
-          <Image src="/HeaderLogo.svg" alt="logo" />
+          <Link href="/">
+            <Image src="/HeaderLogo.svg" alt="logo" />
+          </Link>
         </Center>
 
         <Transition transition="pop-top-right" duration={200} mounted={opened}>
