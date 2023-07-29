@@ -139,9 +139,13 @@ export async function addDocument(
       ...data,
     });
     const docRef = doc(db, collectionName, result.id);
-    await setDoc(docRef, {
-      id: result.id,
-    });
+    await setDoc(
+      docRef,
+      {
+        id: result.id,
+      },
+      { merge: true }
+    );
     if (setLoading) {
       offLoadingAndBack(setLoading, router!, backPath!);
     }
