@@ -127,6 +127,8 @@ export default function OfflineReservationRegister() {
   ): Promise<void> => {
     try {
       if (uid) {
+        offlineReservation.date = targetDate;
+
         const docRef = collection(db, "reservations");
         const result = await addDoc(docRef, {
           ...offlineReservation,
