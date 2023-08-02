@@ -118,6 +118,8 @@ export default function AvailableTimeRegister() {
   ): Promise<void> => {
     try {
       if (uid) {
+        availableTime.date = targetDate;
+
         const docRef = collection(db, "stuffs", uid, "available_times");
         const result = await addDoc(docRef, {
           ...availableTime,
