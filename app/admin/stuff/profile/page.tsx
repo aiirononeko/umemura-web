@@ -40,7 +40,6 @@ export default function StuffProfile() {
         }
       };
       fetchStuff();
-      console.log(stuff);
     }
   }, [uid]);
 

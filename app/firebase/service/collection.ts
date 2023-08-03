@@ -243,18 +243,14 @@ export async function updateStuff(
   if (img != undefined && imgName != undefined) {
     await uploadImage(img, imgName);
   }
-  const imgUrl = await getImageUrl(imgName!);
-  const stuff = (() => {
-    if (img) {
-      if (profile.length > 0) {
-        return { profile, profileImageUrl: imgUrl };
-      }
-      return { profileImageUrl: imgUrl };
-    } else {
-      return {};
-    }
-  })();
+  if (imgName != undefined) {
+    const imgUrl = await getImageUrl(imgName!);
+    const stuff = { profile, profileImageUrl: imgUrl } as Stuff;
+    await updateDocument(stuff, "stuffs", uid);
+  }
+  const stuff = { profile } as Stuff;
   await updateDocument(stuff, "stuffs", uid);
+
   setLoading(false);
   router.push(backPath);
 }
