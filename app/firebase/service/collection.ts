@@ -30,6 +30,7 @@ export interface Course {
   time: string;
   description: string;
   amount: string;
+  discount: string;
 }
 
 export interface Stuff {

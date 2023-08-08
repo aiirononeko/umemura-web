@@ -129,6 +129,7 @@ export default function Top() {
             <th>施術時間</th>
             <th>コース説明</th>
             <th>金額</th>
+            <th>値引</th>
             <th></th>
           </tr>
         </thead>
@@ -141,6 +142,7 @@ export default function Top() {
                 {course.description}
               </td>
               <td>{course.amount}</td>
+              <td>{course.discount}</td>
               <td
                 onClick={(): void => {
                   setTargetCourse(course);
@@ -214,6 +216,14 @@ export default function Top() {
             required
             type="number"
             {...form.getInputProps("amount")}
+            mb="lg"
+          />
+          <TextInput
+            label="値引"
+            placeholder="2500"
+            required
+            type="number"
+            {...form.getInputProps("discount")}
             mb="lg"
           />
           <div className="pt-4">

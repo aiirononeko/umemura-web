@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Container,
@@ -35,6 +35,8 @@ import { db } from "../firebase/config";
 
 export default function Reservation() {
   const [loading, setLoading] = useState(false);
+
+  const deviceWidth = window.innerWidth;
 
   const form = useForm({
     initialValues: {
@@ -267,6 +269,14 @@ export default function Reservation() {
     });
   }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useMemo(() => {
+    if (deviceWidth <= 700) {
+      setIsMobile(true);
+    }
+  }, [deviceWidth]);
+
   return (
     <>
       <Container className="m-auto">
@@ -281,55 +291,53 @@ export default function Reservation() {
             label="First step"
             description="スタッフを選択してください"
           >
-            {stuffs.map((stuff) => (
-              <div key={`${stuff.lastName}_${stuff.firstName}`}>
-                <Grid className="mt-5">
-                  <Grid.Col>
-                    <Card shadow="sm" padding="lg" radius="md" withBorder>
-                      <Card.Section>
-                        <Image
-                          src={stuff.profileImageUrl}
-                          fit="cover"
-                          alt="Norway"
-                          height={400}
-                        />
-                      </Card.Section>
+            <Grid className="mt-5">
+              {stuffs.map((stuff) => (
+                <Grid.Col span={isMobile ? 12 : 6} key={stuff.email}>
+                  <Card shadow="sm" padding="lg" radius="md" withBorder>
+                    <Card.Section>
+                      <Image
+                        src={stuff.profileImageUrl}
+                        fit="cover"
+                        alt="Norway"
+                        height={400}
+                      />
+                    </Card.Section>
 
-                      <Group position="apart" mt="md" mb="xs">
-                        <Text
-                          weight={500}
-                        >{`${stuff.lastName} ${stuff.firstName}`}</Text>
-                      </Group>
+                    <Group position="apart" mt="md" mb="xs">
+                      <Text
+                        weight={500}
+                      >{`${stuff.lastName} ${stuff.firstName}`}</Text>
+                    </Group>
 
-                      <Text size="sm" color="dimmed">
-                        {stuff.profile}
-                      </Text>
+                    <Text size="sm" color="dimmed">
+                      {stuff.profile}
+                    </Text>
 
-                      <Button
-                        variant="light"
-                        color="blue"
-                        fullWidth
-                        mt="md"
-                        radius="md"
-                        onClick={() => {
-                          setSelectedStuff(stuff);
-                          getSubcollectionDocuments(
-                            "stuffs",
-                            stuff.id ?? "",
-                            "courses"
-                          ).then((res) => {
-                            setCourses(res as Course[]);
-                          });
-                          nextStep();
-                        }}
-                      >
-                        このスタッフを選択する
-                      </Button>
-                    </Card>
-                  </Grid.Col>
-                </Grid>
-              </div>
-            ))}
+                    <Button
+                      variant="light"
+                      color="blue"
+                      fullWidth
+                      mt="md"
+                      radius="md"
+                      onClick={() => {
+                        setSelectedStuff(stuff);
+                        getSubcollectionDocuments(
+                          "stuffs",
+                          stuff.id ?? "",
+                          "courses"
+                        ).then((res) => {
+                          setCourses(res as Course[]);
+                        });
+                        nextStep();
+                      }}
+                    >
+                      このスタッフを選択する
+                    </Button>
+                  </Card>
+                </Grid.Col>
+              ))}
+            </Grid>
           </Stepper.Step>
           <Stepper.Step
             label="Second step"
@@ -348,9 +356,31 @@ export default function Reservation() {
                         {course.description}
                       </Text>
 
-                      <Text size="sm" color="dimmed">
-                        料金: {course.amount}円(税込)
-                      </Text>
+                      {Number(course.discount) === 0 ? (
+                        <Text size="sm" color="dimmed">
+                          料金: {course.amount}円(税込)
+                        </Text>
+                      ) : (
+                        <Text size="sm" color="dimmed">
+                          料金:
+                          <span
+                            style={{
+                              textDecoration: "line-through",
+                              textDecorationStyle: "solid",
+                              textDecorationColor: "red",
+                            }}
+                          >
+                            {course.amount}円(税込)
+                          </span>
+                          <span
+                            style={{
+                              color: "red",
+                            }}
+                          >
+                            {course.discount}円(税込)
+                          </span>
+                        </Text>
+                      )}
 
                       <Button
                         variant="light"
