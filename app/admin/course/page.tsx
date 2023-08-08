@@ -42,6 +42,7 @@ export default function Top() {
       time: "",
       description: "",
       amount: "",
+      discount: "0",
     } as Course,
   });
 
