@@ -31,6 +31,7 @@ export interface Course {
   description: string;
   amount: string;
   discount: string;
+  createdAt: Date;
 }
 
 export interface Stuff {

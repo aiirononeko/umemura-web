@@ -43,6 +43,7 @@ export default function Top() {
       description: "",
       amount: "",
       discount: "0",
+      createdAt: new Date(),
     } as Course,
   });
 

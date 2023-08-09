@@ -32,6 +32,7 @@ import { addSubCollectionDocument } from "../firebase/service/collection";
 import sendMail from "./sendMail";
 import { useForm } from "@mantine/form";
 import { db } from "../firebase/config";
+import sendMailToStuff from "./sendMailToStuff";
 
 export default function Reservation() {
   const [loading, setLoading] = useState(false);
@@ -123,6 +124,7 @@ export default function Reservation() {
         })
       ) {
         alert("予約可能な時間ではありません。予約日時を選び直してください。");
+        prevStep();
         prevStep();
         return false;
         // startTimeとendTimeが同じだったらavailableTimeを削除して終了
@@ -343,85 +345,88 @@ export default function Reservation() {
             label="Second step"
             description="コースを選択してください"
           >
-            {courses.map((course) => (
-              <div key={`${course.title}`}>
-                <Grid className="mt-5">
-                  <Grid.Col>
-                    <Card shadow="sm" padding="lg" radius="md" withBorder>
-                      <Group position="apart" mt="md" mb="xs">
-                        <Text weight={500}>{course.title}</Text>
-                      </Group>
+            {courses
+              .sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+              .map((course) => (
+                <div key={`${course.title}`}>
+                  <Grid className="mt-5">
+                    <Grid.Col>
+                      <Card shadow="sm" padding="lg" radius="md" withBorder>
+                        <Group position="apart" mt="md" mb="xs">
+                          <Text weight={500}>{course.title}</Text>
+                        </Group>
 
-                      <Text size="sm" color="dimmed">
-                        {course.description}
-                      </Text>
-
-                      {Number(course.discount) === 0 ? (
                         <Text size="sm" color="dimmed">
-                          料金: {course.amount}円(税込)
+                          {course.description}
                         </Text>
-                      ) : (
-                        <Text size="sm" color="dimmed">
-                          料金:
-                          <span
-                            style={{
-                              textDecoration: "line-through",
-                              textDecorationStyle: "solid",
-                              textDecorationColor: "red",
-                            }}
-                          >
-                            {course.amount}円(税込)
-                          </span>
-                          <span
-                            style={{
-                              color: "red",
-                            }}
-                          >
-                            {course.discount}円(税込)
-                          </span>
-                        </Text>
-                      )}
 
-                      <Button
-                        variant="light"
-                        color="blue"
-                        fullWidth
-                        mt="md"
-                        radius="md"
-                        onClick={async () => {
-                          setSelectedCourse(course);
-                          getSubcollectionDocuments(
-                            "stuffs",
-                            selectedStuff?.id ?? "",
-                            "available_times"
-                          ).then((res) => {
-                            const data = res as AvailableTime[];
-                            setAvailableTimes(data);
+                        {Number(course.discount) === 0 ? (
+                          <Text size="sm" color="dimmed">
+                            料金: {course.amount}円(税込)
+                          </Text>
+                        ) : (
+                          <Text size="sm" color="dimmed">
+                            料金:
+                            <span
+                              style={{
+                                textDecoration: "line-through",
+                                textDecorationStyle: "solid",
+                                textDecorationColor: "red",
+                              }}
+                            >
+                              {course.amount}円(税込)
+                            </span>
+                            <span
+                              style={{
+                                color: "red",
+                              }}
+                            >
+                              {course.discount}円(税込)
+                            </span>
+                          </Text>
+                        )}
 
-                            const today = new Date();
-                            setTargetDateAvailableTimes(
-                              data.filter(
-                                (availableTime) =>
-                                  availableTime.date.toDate().getFullYear() ===
-                                    today.getFullYear() &&
-                                  availableTime.date.toDate().getMonth() ===
-                                    today.getMonth() &&
-                                  availableTime.date.toDate().getDate() ===
-                                    today.getDate()
-                              )
-                            );
-                          });
+                        <Button
+                          variant="light"
+                          color="blue"
+                          fullWidth
+                          mt="md"
+                          radius="md"
+                          onClick={async () => {
+                            setSelectedCourse(course);
+                            getSubcollectionDocuments(
+                              "stuffs",
+                              selectedStuff?.id ?? "",
+                              "available_times"
+                            ).then((res) => {
+                              const data = res as AvailableTime[];
+                              setAvailableTimes(data);
 
-                          nextStep();
-                        }}
-                      >
-                        このコースを選択する
-                      </Button>
-                    </Card>
-                  </Grid.Col>
-                </Grid>
-              </div>
-            ))}
+                              const today = new Date();
+                              setTargetDateAvailableTimes(
+                                data.filter(
+                                  (availableTime) =>
+                                    availableTime.date
+                                      .toDate()
+                                      .getFullYear() === today.getFullYear() &&
+                                    availableTime.date.toDate().getMonth() ===
+                                      today.getMonth() &&
+                                    availableTime.date.toDate().getDate() ===
+                                      today.getDate()
+                                )
+                              );
+                            });
+
+                            nextStep();
+                          }}
+                        >
+                          このコースを選択する
+                        </Button>
+                      </Card>
+                    </Grid.Col>
+                  </Grid>
+                </div>
+              ))}
           </Stepper.Step>
           <Stepper.Step
             label="Third step"
@@ -603,40 +608,73 @@ export default function Reservation() {
                     if (!flag) {
                       setLoading(false);
                       return;
-                    } // 予約可能時間外の場合
+                    } else {
+                      addDocument(
+                        {
+                          customerName,
+                          customerPhoneNumber,
+                          customerEmail,
+                          stuffId: selectedStuff?.id ?? "",
+                          course: selectedCourse?.title ?? "",
+                          date: selectedAvailableTime?.date ?? "",
+                          startTime: selectedAvailableTime?.startTime,
+                          endTime: selectedAvailableTime?.endTime,
+                        } as Reservation,
+                        "reservations"
+                      );
 
-                    addDocument(
-                      {
-                        customerName,
-                        customerPhoneNumber,
-                        customerEmail,
-                        stuffId: selectedStuff?.id ?? "",
-                        course: selectedCourse?.title ?? "",
-                        date: selectedAvailableTime?.date ?? "",
-                        startTime: selectedAvailableTime?.startTime,
-                        endTime: selectedAvailableTime?.endTime,
-                      } as Reservation,
-                      "reservations"
-                    );
+                      /**
+                       * ユーザーにメール送信
+                       */
+                      sendMail(
+                        customerEmail ?? "",
+                        customerName ?? "",
+                        format(
+                          targetDate?.toDate() ?? new Date(),
+                          "yyyy/MM/dd"
+                        ),
+                        reservation.startTime,
+                        reservation.endTime,
+                        selectedCourse?.title ?? "",
+                        selectedCourse?.amount ?? ""
+                      )
+                        .then((res) => {
+                          setLoading(false);
+                          nextStep();
+                        })
+                        .catch((err) => {
+                          setLoading(false);
+                          // TODO: メールの送信に失敗した場合の処理
+                          // nextStep();
+                          console.log(err);
+                        });
 
-                    sendMail(
-                      customerEmail ?? "",
-                      customerName ?? "",
-                      format(targetDate?.toDate() ?? new Date(), "yyyy/MM/dd"),
-                      reservation.startTime,
-                      reservation.endTime,
-                      selectedCourse?.title ?? "",
-                      selectedCourse?.amount ?? ""
-                    )
-                      .then((res) => {
-                        setLoading(false);
-                        nextStep();
-                      })
-                      .catch((err) => {
-                        setLoading(false);
-                        // TODO: メールの送信に失敗した場合の処理
-                        nextStep();
-                      });
+                      /**
+                       * スタッフにメール送信
+                       */
+                      sendMailToStuff(
+                        selectedStuff?.email ?? "",
+                        customerName ?? "",
+                        format(
+                          targetDate?.toDate() ?? new Date(),
+                          "yyyy/MM/dd"
+                        ),
+                        reservation.startTime,
+                        reservation.endTime,
+                        selectedCourse?.title ?? "",
+                        selectedCourse?.amount ?? ""
+                      )
+                        .then((res) => {
+                          setLoading(false);
+                          nextStep();
+                        })
+                        .catch((err) => {
+                          setLoading(false);
+                          // // TODO: メールの送信に失敗した場合の処理
+                          // nextStep();
+                          console.log(err);
+                        });
+                    }
                   });
                 }, 3000);
               }}
