@@ -346,7 +346,7 @@ export default function Reservation() {
             description="コースを選択してください"
           >
             {courses
-              .sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+              .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
               .map((course) => (
                 <div key={`${course.title}`}>
                   <Grid className="mt-5">
