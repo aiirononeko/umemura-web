@@ -12,6 +12,7 @@ import {
   Text,
   Divider,
   TypographyStylesProvider,
+  Space,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
@@ -131,7 +132,7 @@ export default function Top() {
           stuff={builderStuff(lastName, firstName, gender, email)}
         />
       </Modal>
-      <Container className="m-auto">
+      <Container className="m-auto" mb={30}>
         <Center mt={20}>
           <div
             style={{
