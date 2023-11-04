@@ -15,7 +15,7 @@ export const SpinCss: React.CSSProperties = {
 export const Loading = () => {
   return (
     <div style={SpinCss}>
-      <h1>Loding...</h1>
+      <h1>ローディング中です...</h1>
       <br />
       <Loader size="xl" />
     </div>
