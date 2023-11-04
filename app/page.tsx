@@ -204,7 +204,7 @@ export default function Top() {
                 >
                   Holistic Beauty Salon
                   <br />
-                  Lu Miijou
+                  le Miijou
                 </h2>
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function Top() {
               痛みへの対処◎[健康美×姿勢美]を根本から追求するサロンです！姿勢矯正/ダイエット【首肩こり/腰痛】即改善◎
             </h3>
             <p>
-              肩こりや腰痛、頭痛など日々の体の不調は、背骨や骨盤の歪みが根本的な原因と言われています。《ル・ミージュ》では様々な年代毎の悩みに対応し、ただ美しくなるだけでなく骨格の歪みを整え、身体の内側と外側の両方をケアし、健康美をお造りします。もう歳だから…と諦めないで!!ぜひ一度お越しくださいませ。
+              肩こりや腰痛、頭痛など日々の体の不調は、背骨や骨盤の歪みが根本的な原因と言われています。《ル・ミージュ》では様々な年代毎の悩みに対応し、ただ美しくなるだけでなく骨格の歪みを整え、身体の内側と外側の両方をケアし、健康美をお造りします。ぜひ一度お越しくださいませ。
             </p>
           </TypographyStylesProvider>
         </Center>
@@ -261,13 +261,6 @@ export default function Top() {
             </Text>
             <Text align="left">駐車場: あり</Text>
           </Box>
-        </Center>
-        <Center mt={20} mb={30}>
-          <Link href={currentUser ? "/reservation" : "signin"}>
-            <Button variant="outline" color="teal" radius="xl" size="lg">
-              オンラインで予約する
-            </Button>
-          </Link>
         </Center>
       </Container>
       {loading ? <Loading /> : <></>}
