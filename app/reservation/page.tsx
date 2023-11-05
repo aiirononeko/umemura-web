@@ -79,11 +79,10 @@ export default function Reservation() {
   };
 
   const calcAvailableTime = async (
-    availableTimes: AvailableTime[],
+    availableTime: AvailableTime,
     reservation: Reservation,
     selectedStuffId: string
   ): Promise<boolean> => {
-    availableTimes.forEach((availableTime) => {
       // reservationのstartTime ~ endTimeがavailableTimeのstartTime ~ endTimeの範囲外だったら終了
       const reservationStartTime = new Date();
       reservationStartTime.setHours(
@@ -191,8 +190,6 @@ export default function Reservation() {
         );
         return true;
       }
-    });
-    return true;
   };
 
   const [reservations, setReservations] = useState<Reservation[]>();
@@ -599,13 +596,12 @@ export default function Reservation() {
                       endTime: selectedAvailableTime?.endTime,
                     } as Reservation;
 
-                    const flag = calcAvailableTime(
-                      targetDateAvailableTimes,
+                    calcAvailableTime(
+                      selectedAvailableTime ?? targetDateAvailableTimes[0],
                       reservation,
                       selectedStuff?.id ?? ""
-                    );
-
-                    if (!flag) {
+                    ).then(flag => {
+                          if (!flag) {
                       setLoading(false);
                       return;
                     } else {
@@ -675,6 +671,7 @@ export default function Reservation() {
                           console.log(err);
                         });
                     }
+                      });
                   });
                 }, 3000);
               }}
