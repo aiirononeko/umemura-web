@@ -131,7 +131,7 @@ export default function Reservation() {
         reservation.startTime === availableTime.startTime &&
         reservation.endTime === availableTime.endTime
       ) {
-        deleteSubCollectionDocument(
+        await deleteSubCollectionDocument(
           "stuffs",
           selectedStuffId,
           "available_times",
@@ -141,7 +141,7 @@ export default function Reservation() {
         // reservationのstartTimeがavailableTimeと同じ場合
       } else if (reservation.startTime === availableTime.startTime) {
         // availableTimeのstartTimeをreservationのendTimeに更新して終了
-        updateSubCollectionDocument(
+        await updateSubCollectionDocument(
           {
             startTime: reservation.endTime,
           } as AvailableTime,
@@ -154,7 +154,7 @@ export default function Reservation() {
       } else if (reservation.endTime === availableTime.endTime) {
         // reservationのendTimeがavailableTimeのEndTimeと同じ場合
         // availableTimeのendTimeをreservationのstartTimeに更新して終了
-        updateSubCollectionDocument(
+        await updateSubCollectionDocument(
           {
             endTime: reservation.startTime,
           } as AvailableTime,
@@ -167,7 +167,7 @@ export default function Reservation() {
       } else {
         // それ以外の場合
         // availableTimeのendTimeをreservationのstartTimeに更新
-        updateSubCollectionDocument(
+        await updateSubCollectionDocument(
           {
             endTime: reservation.startTime,
           } as AvailableTime,
@@ -178,7 +178,7 @@ export default function Reservation() {
         );
         // 新しいavailableTimeを作成して、
         // reservationのendTimeをavailableTimeのstartTimeに、大元のendTimeをavailableTimeのendTimeに更新して終了
-        addSubCollectionDocument(
+        await addSubCollectionDocument(
           {
             date: availableTime.date,
             startTime: reservation.endTime,
