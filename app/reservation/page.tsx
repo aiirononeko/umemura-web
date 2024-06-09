@@ -564,7 +564,11 @@ export default function Reservation() {
             )} ${selectedAvailableTime?.startTime} ~ ${
               selectedAvailableTime?.endTime
             }`}</p>
-            <p>{`お支払い金額: ${selectedCourse?.amount}円 (現地決済)`}</p>
+            {(selectedCourse?.discount || selectedCourse?.discount !== "") ? (
+              <p>{`お支払い金額: ${selectedCourse?.discount}円 (現地決済)`}</p>
+            ): (
+              <p>{`お支払い金額: ${selectedCourse?.amount}円 (現地決済)`}</p>
+            )}
 
             <Button
               variant="light"
