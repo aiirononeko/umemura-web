@@ -410,7 +410,7 @@ export default function Reservation() {
                                       today.getMonth() &&
                                     availableTime.date.toDate().getDate() ===
                                       today.getDate()
-                                )
+                                ).sort((a, b) => Number(a.startTime.split(':')[0]) - Number(b.startTime.split(':')[0]))
                               );
                             });
 
@@ -447,7 +447,7 @@ export default function Reservation() {
                           date?.getMonth() &&
                         availableTime.date.toDate().getDate() ===
                           date?.getDate()
-                    )
+                    ).sort((a, b) => Number(a.startTime.split(':')[0]) - Number(b.startTime.split(':')[0]))
                   );
                 }}
               />
