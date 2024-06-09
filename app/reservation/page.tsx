@@ -632,7 +632,7 @@ export default function Reservation() {
                         reservation.startTime,
                         reservation.endTime,
                         selectedCourse?.title ?? "",
-                        selectedCourse?.amount ?? ""
+                        selectedCourse?.discount ?? selectedCourse?.amount ?? ""
                       )
                         .then((res) => {
                           setLoading(false);
